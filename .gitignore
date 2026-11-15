@@ -1,0 +1,5 @@
+android/build/
+android/assets/
+android/tools/
+android/original/
+*.idsig

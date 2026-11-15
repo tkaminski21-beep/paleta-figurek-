@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paleta figurek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday hobby: warm, practical, pictures before words
+   IDEA the painter's wet palette and a rack of Vallejo dropper bottles
+   PICTURE a big shaded sphere painted in the chosen material's four tones, with the four drops beside it
+   COLOUR white / near-black ground, paint red #b8202a as accent, the paints themselves carry all other colour
+   TYPE Sora for headings, Inter for text
+   LAYOUT phone: title, sphere, steps stacked, bottom tab bar; laptop: sphere left, steps right, tabs on top row */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#141210);--ink:light-dark(#1d1916,#f2ece4);--quiet:light-dark(#6b625b,#a99e94);--card:light-dark(#f6f2ec,#1f1b18);--line:light-dark(#e6dfd5,#332d28);--acc:#b8202a;--accInk:light-dark(#b8202a,#f0656b);--ok:#3e8e41;--bad:#c0392b}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{font-family:Sora,Inter,sans-serif;letter-spacing:-.02em;line-height:1.1;margin:0}
+h1{font-size:clamp(26px,6vw,40px);text-wrap:balance}
+h2{font-size:clamp(22px,5vw,30px);margin-bottom:6px}
+h3{font-size:18px}
+p{margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-left,0px)) 28px}
+.top{display:flex;align-items:center;gap:12px;padding-top:max(14px,env(safe-area-inset-top,0px))}
+.rack{display:flex;gap:4px;margin-left:auto}
+.rack i{width:12px;height:26px;border-radius:3px 3px 4px 4px;display:block}
+.lead{color:var(--quiet);margin-top:6px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));padding-bottom:env(safe-area-inset-bottom,0px)}
+nav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 1px 9px;color:var(--quiet);text-decoration:none;font-size:11.5px;font-weight:600;min-height:60px}
+nav a svg{width:24px;height:24px}
+nav a[aria-current=page]{color:var(--accInk)}
+section{display:none}
+section.on{display:block}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;margin:14px -16px 0;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:9px 14px 9px 9px;font:600 15px Inter,sans-serif;min-height:44px;cursor:pointer}
+.chip b{width:22px;height:22px;border-radius:50%;display:block}
+.chip[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.chip:focus-visible,nav a:focus-visible,button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.recipe{display:grid;gap:18px;margin-top:8px}
+.ball{background:var(--card);border-radius:22px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ball svg{width:min(260px,70vw);height:auto}
+.ball .where{color:var(--quiet);text-align:center;font-size:15px}
+.steps{display:grid;gap:10px}
+.step{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;align-items:center;background:var(--card);border-radius:18px;padding:12px}
+.sw{width:64px;height:64px;border-radius:14px;position:relative;box-shadow:inset 0 -6px 0 rgba(0,0,0,.12)}
+.sw span{position:absolute;top:-6px;left:-6px;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--bg);font:700 13px/24px Sora,sans-serif;text-align:center}
+.role{font:700 13px Inter,sans-serif;color:var(--quiet)}
+.mix{font-weight:600;font-size:16px}
+.drops{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;align-items:center}
+.drops i{width:16px;height:20px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;display:block;border:1px solid rgba(0,0,0,.15)}
+.drops em{font-style:normal;color:var(--quiet);font-size:13px;margin:0 4px}
+.note{font-size:14px;color:var(--quiet);margin-top:2px}
+.missing{margin-top:24px;border:1.5px dashed var(--line);border-radius:18px;padding:14px}
+.missing h3{margin-bottom:8px}
+.miss{display:flex;flex-wrap:wrap;gap:10px}
+.miss div{display:flex;align-items:center;gap:8px;font-size:14.5px}
+.miss b{width:26px;height:26px;border-radius:7px;display:block;border:1px solid rgba(0,0,0,.2)}
+.grid2{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));margin-top:14px}
+.card{background:var(--card);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.card svg{width:100%;height:auto;display:block}
+.card p{font-size:15px;color:var(--quiet)}
+.wheel{display:grid;gap:14px;align-items:center}
+.wheel svg{width:min(320px,82vw);margin:0 auto;display:block}
+.wheel text{paint-order:stroke;stroke:var(--bg);stroke-width:4px}
+.pair{display:flex;align-items:center;gap:12px;justify-content:center;font-weight:600}
+.pair b{width:40px;height:40px;border-radius:50%;display:block}
+.tone{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:4px}
+.tone div{border-radius:10px;padding:8px 6px;text-align:center;font-size:13px;line-height:1.25;font-weight:600}
+.bar{display:flex;height:54px;border-radius:12px;overflow:hidden;font:700 16px Sora,sans-serif;color:#fff}
+.bar div{display:flex;align-items:center;justify-content:center}
+.vs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;text-align:center;font-size:14px;font-weight:600}
+.vs svg{width:100%;max-width:120px;margin:0 auto}
+.mark{display:inline-block;width:22px;height:22px;border-radius:50%;color:#fff;font:700 13px/22px Inter;margin-right:4px}
+.list{display:grid;gap:8px;margin-top:10px}
+.item{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:10px 12px;min-height:56px;cursor:pointer}
+.item input{width:22px;height:22px;accent-color:var(--acc);flex:none}
+.item small{display:block;color:var(--quiet);font-size:13.5px}
+#buy .item.done .t{text-decoration:line-through;color:var(--quiet)}
+.warn{background:light-dark(#fdecec,#3a1b1b);border-radius:16px;padding:14px;margin-top:14px;font-size:15px}
+.secth{margin-top:28px}
+.seg.seg4{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:620px){.seg.seg4{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tool{margin-top:14px}
+.owngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:8px;margin-top:8px}
+.own{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:12px;padding:8px 10px;min-height:48px;cursor:pointer;font-size:14.5px}
+.own input{width:20px;height:20px;accent-color:var(--acc);flex:none}
+.own i{width:22px;height:22px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.15)}
+.own.off span{color:var(--quiet);text-decoration:line-through}
+em.no{font-style:normal;background:var(--bad);color:#fff;border-radius:6px;padding:0 6px;font-size:12.5px;margin-left:4px}
+em.yes{font-style:normal;color:var(--ok);font-weight:700}
+.sub{font-size:13.5px;margin-top:4px;color:var(--accInk)}
+input[type=search],input[type=text],input[type=number],select{font:16px Inter,sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:46px;width:100%}
+#zq{margin-top:12px}
+.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px;margin-top:12px}
+.presets button{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px;text-align:left;color:var(--ink);font:500 14px/1.3 Inter,sans-serif;min-height:64px;cursor:pointer}
+.presets button b{display:block;font:700 18px Sora,sans-serif;margin-bottom:2px}
+.custom{display:flex;gap:8px;align-items:center;margin-top:10px}
+.custom input{width:90px;flex:none}
+.custom button,.link,.gbtn{min-height:44px;border-radius:12px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);font:600 15px Inter,sans-serif;padding:0 14px;cursor:pointer}
+.link{background:transparent;color:var(--accInk);border:0;padding:0 6px;min-height:36px}
+.pbar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:6px}
+.pbar i{display:block;height:100%;background:var(--acc);border-radius:99px}
+.timer .x{width:44px;height:44px;border:0;background:transparent;color:var(--quiet);font-size:26px;cursor:pointer}
+.timer.fin{outline:2px solid var(--ok)}
+.timer.fin small{color:var(--ok);font-weight:700}
+.fl{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+.stepper{display:flex;align-items:center;gap:10px;margin-top:10px}
+.stepper span{flex:1;color:var(--quiet);font-size:14.5px}
+.stepper button{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:700 20px Inter;cursor:pointer}
+.stepper b{min-width:24px;text-align:center;font:700 18px Sora,sans-serif}
+.drops.big i{width:20px;height:25px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px}
+.mixres{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0 6px;font:700 20px Sora}
+.mixres i{width:52px;height:52px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+.mixres i.res{width:72px;height:72px}
+.gloss{display:grid;gap:8px;margin-top:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.gl{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:10px 12px}
+.gl b{display:block}.gl span{display:block;font-size:14px;color:var(--quiet);line-height:1.4}
+#fprog{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:14px;color:var(--quiet)}
+#fprog .pbar{flex:1;margin:0}
+.flow li[role=checkbox]{cursor:pointer;background:var(--card);border-radius:12px;padding:8px 10px}
+.flow li.ok::before{content:"✓";background:var(--ok)}
+.flow li.ok span{color:var(--quiet);text-decoration:line-through}
+.basepic{height:64px;border-radius:50%/40%;margin:12px auto 4px;width:min(260px,70vw);box-shadow:inset 0 -8px 0 rgba(0,0,0,.25)}
+.gform{display:grid;gap:10px}
+.ups{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.up{position:relative;border:2px dashed var(--line);border-radius:14px;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--quiet);font-weight:600;background-size:cover;background-position:center;overflow:hidden}
+.up.has{border-style:solid;color:transparent}
+.up input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.ba{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr));gap:8px}
+.ba figure{margin:0}.ba img{width:100%;border-radius:10px;display:block}
+.ba figcaption{font-size:13px;color:var(--quiet);margin-top:2px}
+.gh{display:flex;justify-content:space-between;gap:8px}.gh span{color:var(--quiet);font-size:13.5px}
+.del{align-self:flex-start}
+#gmsg{font-size:14px;color:var(--accInk);min-height:20px}
+.seg.seg4{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:620px){.seg.seg4{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.gen{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.gen button{flex:1 1 auto;min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:600 14.5px Inter,sans-serif;padding:0 14px;cursor:pointer}
+.gen button.prim,.prim{background:var(--acc);border-color:var(--acc);color:#fff}
+.filebtn{position:relative;display:inline-flex;align-items:center;margin-top:12px;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.fimg{width:100%;max-width:360px;border-radius:12px;margin-top:12px;display:block;cursor:crosshair}
+.picked{outline:2px solid var(--acc);margin-top:8px}
+.duo{display:flex;flex:none}.duo i{width:34px;height:44px;display:block}.duo i:first-child{border-radius:10px 0 0 10px}.duo i:last-child{border-radius:0 10px 10px 0}
+.planwrap{display:grid;gap:14px;margin-top:10px}
+@media(min-width:700px){.planwrap{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}}
+#psvg{width:min(260px,70vw);height:auto;margin:0 auto;display:block;background:var(--card);border-radius:20px}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-top:8px}
+.pal button{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:6px 8px;min-height:44px;font:500 13.5px Inter,sans-serif;cursor:pointer;text-align:left}
+.pal button[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc) inset}
+.pal i{width:22px;height:22px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.15)}
+.strip{display:flex;border-radius:8px;overflow:hidden;flex:none}.strip i{width:10px;height:36px;display:block}
+textarea{font:15px/1.4 Inter,sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;margin-top:10px}
+.cab b{display:block}.cabv{display:flex;gap:24px;font:700 28px Sora,sans-serif;margin:6px 0}
+.verdict{border-radius:10px;padding:8px 12px;background:var(--line);font-weight:700}
+.verdict.ok{background:var(--ok);color:#fff}.verdict.bad{background:var(--bad);color:#fff}
+.rng{width:100%;accent-color:var(--acc);height:36px}
+details summary{cursor:pointer;min-height:32px}
+details p{font-size:14px;color:var(--quiet);margin-top:6px}
+code{font-size:13px;overflow-wrap:anywhere}
+.lowb{margin-left:auto;flex:none;border:1px solid var(--line);background:var(--bg);color:var(--quiet);border-radius:8px;font:600 12px Inter,sans-serif;padding:4px 8px;min-height:30px;cursor:pointer}
+.lowb.on{background:#e8a23a;border-color:#e8a23a;color:#1d1916}
+.cfrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px;gap:6px;margin-top:6px}
+.cfrow input:nth-of-type(2){grid-column:1/3}
+.cfrow .x{grid-row:1/3;grid-column:3;width:44px;border:0;background:transparent;font-size:24px;color:var(--quiet);cursor:pointer}
+#cform{gap:6px}#cform .fl{margin-top:8px}
+#tb{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top,0px)) 18px max(16px,env(safe-area-inset-bottom,0px))}
+#tb[hidden]{display:none}
+.tbtop{display:flex;align-items:center;justify-content:space-between;font:700 20px Sora,sans-serif}
+#tbx{width:48px;height:48px;border:0;background:var(--card);border-radius:50%;font-size:28px;color:var(--ink);cursor:pointer}
+.tbstep{color:var(--accInk);font-weight:700;margin-top:6px}
+#tbbody{flex:1;overflow:auto;display:flex;flex-direction:column;justify-content:center}
+.tbtext{font:600 clamp(24px,6.5vw,38px)/1.3 Inter,sans-serif}
+.tbparts{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.tbparts span{display:flex;align-items:center;gap:6px;background:var(--card);border-radius:99px;padding:4px 10px 4px 4px;font-size:13.5px}
+.tbparts i{width:20px;height:20px;border-radius:50%}
+.tbnav{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.tbnav button{min-height:72px;border-radius:18px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:700 18px Inter,sans-serif;cursor:pointer}
+.tbnav button.prim{background:var(--acc);border-color:var(--acc);color:#fff}
+.tbnav button:disabled{opacity:.4}
+[hidden]{display:none!important}
+.seg.seg3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cnt{display:inline-block;background:var(--line);border-radius:99px;padding:0 8px;font-size:13px;vertical-align:middle}
+.qi{align-items:flex-start}
+.qb{display:flex;gap:4px;flex:none}
+.qb button{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:700 16px Inter;cursor:pointer}
+#qfig,#qname{margin-top:6px}#qadd{margin-top:10px}
+.scres{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 6px}
+.scres div{background:var(--bg);border-radius:12px;padding:10px 12px}
+.scres span{display:block;font-size:13px;color:var(--quiet)}
+.scres b{font:800 clamp(22px,6vw,30px) Sora,sans-serif;white-space:nowrap}
+.custom #wip,.custom #pname{width:auto;flex:1 1 auto}
+.tbdone{text-align:center}.tbdone b{font:800 32px Sora,sans-serif;display:block}.tbdone p{margin:10px 0 16px;color:var(--quiet)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--card);border-radius:14px;padding:5px;margin-top:12px}
+.seg button{min-height:44px;border:0;border-radius:10px;background:transparent;color:var(--ink);font:600 15px Inter,sans-serif;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:baseline;background:var(--card);border-radius:12px;padding:10px 14px}
+.row span{color:var(--quiet);font-size:14.5px}
+.row b{text-align:right;font-size:15px}
+.fig-head{margin-top:6px}
+.fig-head .note{font-size:15px;margin-top:4px}
+.parts{display:grid;gap:8px;margin-top:10px}
+.part{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:10px 12px}
+.part .trio{display:flex;border-radius:10px;overflow:hidden;width:72px;height:44px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.part .trio i{flex:1}
+.part b{display:block;font-size:15.5px}
+.part span{display:block;font-size:14px;color:var(--quiet);line-height:1.4}
+.flow{list-style:none;padding:0;margin:10px 0 0;counter-reset:f;display:grid;gap:8px}
+.flow li{counter-increment:f;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start;font-size:15.5px}
+.flow li::before{content:counter(f);width:30px;height:30px;border-radius:50%;background:var(--acc);color:#fff;font:700 14px/30px Sora,sans-serif;text-align:center}
+.tip{margin-top:16px;background:light-dark(#fff6df,#2e2715);border-radius:16px;padding:14px;font-size:15px}
+@media(min-width:820px){
+ body{padding-bottom:0}
+ nav{position:sticky;top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--line);grid-template-columns:repeat(6,auto);justify-content:center;gap:8px}
+ nav a{flex-direction:row;min-height:52px;font-size:15px;padding:8px 16px}
+ .recipe{grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:start}
+ .ball{position:sticky;top:70px}
+ .wheel{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+@media(prefers-reduced-motion:no-preference){.ball svg ellipse,.ball svg circle{transition:fill .35s}}
+</style>
+</head>
+<body>
+<nav id="nav" aria-label="Działy">
+ <a href="#przepisy" data-s="przepisy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M6 10a7 5 0 0 1 12 0"/></svg>Przepisy</a>
+ <a href="#figurki" data-s="figurki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="3"/><path d="M7 21l2-10h6l2 10M5 21h14"/></svg>Figurki</a>
+ <a href="#narzedzia" data-s="narzedzia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 3h6"/></svg>Narzędzia</a>
+ <a href="#wiedza" data-s="wiedza"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"/></svg>Wiedza</a>
+ <a href="#druk" data-s="druk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18h16M6 14h12M8 10h8M10 6h4"/></svg>Druk 3D</a>
+ <a href="#zakupy" data-s="zakupy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7h14l-1.5 12h-11zM9 7a3 3 0 0 1 6 0"/></svg>Zakupy</a>
+</nav>
+
+<div class="wrap">
+<header class="top">
+ <div><h1>Paleta figurek</h1></div>
+ <div class="rack" aria-hidden="true" id="rack"></div>
+</header>
+
+<section id="przepisy">
+ <p class="lead">Wybierz materiał. Kulka pokazuje, jak będzie wyglądał, a kroki mówią, czym go pomalować Twoimi farbami Vallejo.</p>
+ <div class="chips" id="chips" role="group" aria-label="Materiał"></div>
+ <div class="recipe">
+  <div class="ball"><svg id="sphere" viewBox="0 0 200 200" role="img" aria-label="Podgląd koloru"></svg><h3 id="mname"></h3><p class="where" id="mwhere"></p></div>
+  <div class="steps" id="steps"></div>
+ </div>
+ <h2 class="secth">Podstawki</h2>
+ <p class="lead">Ładna podstawka to połowa efektu. Wybierz teren.</p>
+ <div class="chips" id="bchips" role="group" aria-label="Podstawka"></div>
+ <div id="bbody"></div>
+ <p class="note" style="margin-top:16px">Farby zamówione 14.11 (Black, Magic Blue, Off White, Wolf Grey, Basic Skintone) są już w przepisach.</p>
+</section>
+
+<section id="figurki">
+ <div class="seg seg3" role="group" aria-label="Widok"><button data-t="guide" aria-pressed="true">Instrukcje</button><button data-t="queue" aria-pressed="false">Kolejka</button><button data-t="gal" aria-pressed="false">Galeria</button></div>
+ <div id="fg-guide">
+ <p class="lead" style="margin-top:10px">Popularne wydruki krok po kroku. Dotknij kroku, żeby go odhaczyć: postęp zapisuje się przy każdej figurce.</p>
+ <div class="chips" id="fchips" role="group" aria-label="Figurka"></div>
+ <div class="fig-head"><h2 id="fname"></h2><p class="note" id="fdesc"></p></div>
+ <div class="gen" style="margin-top:10px"><button id="tbopen" class="prim">Tryb przy stole</button><button id="fedit" hidden>Edytuj</button></div>
+ <div class="card" id="cform" hidden style="margin-top:12px">
+  <h3>Własna figurka</h3>
+  <label class="fl" for="cfn">Nazwa</label><input id="cfn" type="text" maxlength="50" placeholder="np. Geralt">
+  <label class="fl" for="cfd">Opis</label><input id="cfd" type="text" maxlength="120" placeholder="Krótko, jakie kolory i klimat">
+  <label class="fl">Części i kolory</label><div id="cfparts"></div><button class="link" id="cfadd" style="align-self:flex-start">+ Dodaj część</button>
+  <label class="fl" for="cfk">Kroki (każdy w nowej linii)</label><textarea id="cfk" rows="5" placeholder="Zenithal&#10;Bazy&#10;Wash&#10;Światła"></textarea>
+  <label class="fl" for="cft">Wskazówka</label><input id="cft" type="text" maxlength="160">
+  <div class="gen"><button id="cfsave" class="prim">Zapisz</button><button id="cfcancel">Anuluj</button></div>
+  <button class="link" id="cfdel" hidden style="align-self:flex-start;color:var(--bad)">Usuń figurkę</button>
+ </div>
+ <h3 class="secth">Kolory części</h3>
+ <div class="parts" id="fparts"></div>
+ <h3 class="secth">Kolejność malowania</h3>
+ <div id="fprog"></div>
+ <ol class="flow" id="fsteps"></ol>
+ <div class="tip" id="ftip"></div>
+ </div>
+ <div id="fg-queue" hidden>
+  <div class="card" style="margin-top:12px">
+   <h3>Dodaj do kolejki</h3>
+   <input id="qname" type="text" maxlength="50" placeholder="Nazwa, np. Artur Morgan">
+   <label class="fl" for="qfig">Instrukcja (opcjonalnie)</label><select id="qfig"></select>
+   <button class="gbtn" id="qadd">Dodaj</button>
+  </div>
+  <div id="qcols"></div>
+ </div>
+ <div id="fg-gal" hidden>
+  <div class="card" style="margin-top:12px">
+   <h3>Dodaj figurkę</h3>
+   <div class="gform">
+    <input id="gname" type="text" placeholder="Nazwa, np. Artur Morgan" maxlength="60">
+    <div class="ups">
+     <label class="up" id="gpa">Zdjęcie przed<input id="ga" type="file" accept="image/*"></label>
+     <label class="up" id="gpb">Zdjęcie po<input id="gb" type="file" accept="image/*"></label>
+    </div>
+    <button class="gbtn" id="gsave">Zapisz w galerii</button>
+    <div id="gmsg" role="status"></div>
+   </div>
+  </div>
+  <div class="grid2" id="glist"></div>
+  <p class="note" style="margin-top:10px">Zdjęcia zapisują się tylko w tym urządzeniu, zmniejszone. Zmieści się kilkadziesiąt.</p>
+ </div>
+</section>
+
+<section id="narzedzia">
+ <h2>Narzędzia</h2>
+ <div class="seg seg4" role="group" aria-label="Narzędzie">
+  <button data-t="farby" aria-pressed="true">Moje farby</button>
+  <button data-t="zam" aria-pressed="false">Zamienniki</button>
+  <button data-t="timer" aria-pressed="false">Minutnik</button>
+  <button data-t="calc" aria-pressed="false">Kalkulator</button>
+  <button data-t="foto" aria-pressed="false">Ze zdjęcia</button>
+  <button data-t="plan" aria-pressed="false">Plan kolorów</button>
+  <button data-t="kopia" aria-pressed="false">Kopia</button>
+  <button data-t="warsztat" aria-pressed="false">Warsztat</button>
+ </div>
+
+ <div class="tool" id="t-farby">
+  <p class="lead">Odznacz farbę, gdy się skończy. Przepisy pokażą wtedy „brak” i podpowiedzą zamiennik z tego, co masz.</p>
+  <div id="ownList"></div>
+ </div>
+
+ <div class="tool" id="t-zam" hidden>
+  <p class="lead">Poradniki na YouTube używają zwykle farb Citadel. Wpisz nazwę, a dostaniesz najbliższy odpowiednik Vallejo Game Color.</p>
+  <input id="zq" type="search" placeholder="np. Mephiston Red" autocomplete="off">
+  <div class="list" id="zres"></div>
+  <p class="note" style="margin-top:10px">Odpowiedniki są przybliżone: odcienie różnych marek nigdy nie są identyczne. Znaczek ✓ oznacza farbę, którą już masz.</p>
+ </div>
+
+ <div class="tool" id="t-timer" hidden>
+  <p class="lead">Dotknij, żeby odliczyć czas schnięcia. Minutniki działają dalej, gdy przełączysz zakładkę.</p>
+  <div class="presets" id="tpre"></div>
+  <div class="custom"><input id="tmin" type="number" min="1" max="600" value="10" inputmode="numeric" aria-label="Minuty"><span>min</span><button id="tadd">Własny minutnik</button></div>
+  <div class="list" id="tlist"></div>
+  <p class="note" style="margin-top:10px">Czasy są orientacyjne, dla 20 °C. Przy chłodzie i wilgoci dolicz więcej. W aplikacji na Androidzie dostaniesz też powiadomienie, gdy aplikacja jest zamknięta.</p>
+ </div>
+
+ <div class="tool" id="t-calc" hidden>
+  <h3>Rozcieńczanie</h3>
+  <div class="card" style="margin-top:8px">
+   <label class="fl" for="crat">Do czego</label>
+   <select id="crat">
+    <option value="1">Warstwa farby — woda 1:1</option>
+    <option value="3">Lekki glaze — medium 1:3</option>
+    <option value="5" selected>Glaze — medium 1:5</option>
+    <option value="8">Filtr, zarost — medium 1:8</option>
+    <option value="6">Wash z farby — medium 1:6</option>
+   </select>
+   <div class="stepper"><span>Krople farby</span><button data-d="-1" aria-label="mniej">−</button><b id="cdrops">2</b><button data-d="1" aria-label="więcej">+</button></div>
+   <div class="drops big" id="cvis"></div>
+   <p class="mix" id="cout"></p>
+  </div>
+  <h3 class="secth">Mieszanka dwóch farb</h3>
+  <div class="card" style="margin-top:8px">
+   <div class="two">
+    <div><label class="fl" for="ma">Farba A</label><select id="ma"></select><div class="stepper"><span>Krople</span><button data-m="a" data-d="-1">−</button><b id="mav">2</b><button data-m="a" data-d="1">+</button></div></div>
+    <div><label class="fl" for="mb">Farba B</label><select id="mb"></select><div class="stepper"><span>Krople</span><button data-m="b" data-d="-1">−</button><b id="mbv">1</b><button data-m="b" data-d="1">+</button></div></div>
+   </div>
+   <div class="mixres"><i id="msa"></i><span>+</span><i id="msb"></i><span>=</span><i id="msr" class="res"></i></div>
+   <p class="note">Wynik jest orientacyjny: prawdziwe farby mieszają się trochę ciemniej i bardziej szaro niż na ekranie.</p>
+  </div>
+ </div>
+
+ <div class="tool" id="t-foto" hidden>
+  <p class="lead">Wybierz zdjęcie postaci, np. zrzut ekranu z gry. Aplikacja znajdzie główne kolory i dobierze do nich Twoje farby.</p>
+  <label class="gbtn filebtn">Wybierz zdjęcie<input id="fpick" type="file" accept="image/*"></label>
+  <label class="own" style="margin-top:10px;max-width:320px"><input type="checkbox" id="fbg" checked><span>Pomiń tło przy krawędziach zdjęcia</span></label>
+  <div id="fprev"></div>
+  <div id="fpick1"></div>
+  <div class="list" id="fres"></div>
+  <button class="gbtn" id="f2plan" hidden style="margin-top:10px">Przenieś kolory do planu</button>
+ </div>
+
+ <div class="tool" id="t-plan" hidden>
+  <p class="lead">Dotknij części figurki, potem farby. Sprawdź kilka zestawów, zanim zaczniesz malować.</p>
+  <div class="planwrap">
+   <svg id="psvg" viewBox="0 0 200 300" role="img" aria-label="Plan kolorów figurki"></svg>
+   <div>
+    <p class="mix" id="psel">Wybrana część: płaszcz</p>
+    <div class="pal" id="ppal"></div>
+    <h3 class="secth">Generator zestawu</h3>
+    <div class="gen"><button data-g="comp">Dopełniające</button><button data-g="tri">Triada</button><button data-g="ana">Sąsiednie</button></div>
+    <p class="note" id="pgen"></p>
+    <h3 class="secth">Zapisane zestawy</h3>
+    <div class="custom"><input id="pname" type="text" placeholder="Nazwa zestawu" maxlength="40"><button id="psave">Zapisz</button></div>
+    <div class="list" id="plist"></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="tool" id="t-kopia" hidden>
+  <p class="lead">Strona w przeglądarce i aplikacja na telefonie mają osobne dane. Skopiuj je tutaj i wklej w drugim miejscu.</p>
+  <div class="gen"><button id="kexp">Eksportuj wszystko</button><button id="kexp2">Bez zdjęć (mniejszy)</button></div>
+  <textarea id="ktext" rows="6" placeholder="Tu pojawi się kopia. Możesz też wkleić kopię z innego urządzenia."></textarea>
+  <div class="gen"><button id="kcopy">Kopiuj</button><button id="kimp">Importuj wklejone</button></div>
+  <label class="gbtn filebtn" style="margin-top:8px">Importuj z pliku<input id="kfile" type="file" accept=".json,.txt,application/json,text/plain"></label>
+  <p class="note" id="kmsg" role="status"></p>
+ </div>
+
+ <div class="tool" id="t-warsztat" hidden>
+  <p class="lead">Panel dla szafki lakierniczej i lampy na ESP32. Działa w aplikacji na Androidzie, w tej samej sieci Wi-Fi.</p>
+  <div class="custom"><input id="wip" type="text" inputmode="url" placeholder="Adres ESP32, np. 192.168.1.50"><button id="wcon">Połącz</button></div>
+  <div class="card cab" id="wcab"><b>Szafka lakiernicza</b><div class="cabv"><span id="wt">— °C</span><span id="wh">— %</span></div><div id="wv" class="verdict">Brak połączenia</div></div>
+  <div class="card" style="margin-top:10px">
+   <b>Lampa</b>
+   <label class="fl" for="wk" style="margin-top:8px">Barwa: <span id="wkv">4000</span> K</label>
+   <input id="wk" type="range" min="3000" max="6500" step="100" value="4000" class="rng">
+   <label class="fl" for="wb">Jasność: <span id="wbv">80</span>%</label>
+   <input id="wb" type="range" min="0" max="100" step="5" value="80" class="rng">
+   <div class="gen"><button data-k="4000">Malowanie 4000 K</button><button data-k="5500">Zdjęcie 5500 K</button></div>
+  </div>
+  <details class="card" style="margin-top:10px"><summary><b>Co musi umieć ESP32</b></summary>
+   <p>GET <code>/data</code> zwraca JSON <code>{"t":21.5,"h":48}</code> (temperatura °C, wilgotność %).</p>
+   <p>GET <code>/lamp?k=4000&amp;b=80</code> ustawia barwę 3000–6500 K i jasność 0–100%.</p>
+   <p>Odpowiedzi z nagłówkiem <code>Access-Control-Allow-Origin: *</code>. Lakierować można przy wilgotności poniżej 65% i temperaturze od 15 °C.</p>
+  </details>
+ </div>
+</section>
+
+<section id="slownik">
+ <h2 class="secth">Słowniczek</h2>
+ <div class="gloss" id="gloss"></div>
+</section>
+
+<section id="kolory">
+ <h2>Koło barw</h2>
+ <p class="lead">Dotknij koloru. Naprzeciw leży jego dopełniający: obok siebie wzmacniają się, zmieszane się gaszą.</p>
+ <div class="wheel">
+  <svg id="wheel" viewBox="0 0 240 240" role="img" aria-label="Koło barw"></svg>
+  <div>
+   <div class="pair" id="pair"></div>
+   <p class="note" id="pairNote" style="text-align:center;margin-top:8px"></p>
+  </div>
+ </div>
+ <h2 class="secth">Cień i światło bez szarości</h2>
+ <p class="lead">Nie przyciemniaj czernią i nie rozjaśniaj bielą. Dodaj sąsiedni kolor.</p>
+ <div class="grid2" id="tones"></div>
+ <h2 class="secth">Zasada 60 / 30 / 10</h2>
+ <p class="lead">Jeden kolor dominuje, drugi go wspiera, trzeci jest małym akcentem.</p>
+ <div class="card" style="margin-top:12px">
+  <div class="bar"><div style="flex:60;background:#2f6b3b">60%</div><div style="flex:30;background:#5e3a22">30%</div><div style="flex:10;background:#b08a2e">10</div></div>
+  <svg viewBox="0 0 320 170" aria-hidden="true">
+   <ellipse cx="160" cy="158" rx="70" ry="10" fill="#7c7f82"/>
+   <path d="M98 156 L128 52 L192 52 L222 156Z" fill="#2f6b3b"/>
+   <rect x="138" y="58" width="44" height="98" fill="#5e3a22"/>
+   <rect x="134" y="104" width="52" height="9" fill="#3b2416"/><rect x="155" y="103" width="10" height="11" fill="#cfb462"/>
+   <path d="M126 54 L160 18 L194 54Z" fill="#2f6b3b"/><circle cx="160" cy="44" r="16" fill="#d9a07a"/>
+   <circle cx="160" cy="62" r="5" fill="#b08a2e"/>
+   <rect x="226" y="40" width="6" height="112" fill="#b9bdc0"/><rect x="216" y="128" width="26" height="6" fill="#b08a2e"/>
+   <text x="112" y="80" text-anchor="end" fill="currentColor" font-size="13" font-weight="600">płaszcz 60%</text>
+   <text x="112" y="112" text-anchor="end" fill="currentColor" font-size="13" font-weight="600">ubranie 30%</text>
+   <text x="252" y="135" fill="currentColor" font-size="13" font-weight="600">złoto 10%</text>
+  </svg>
+ </div>
+</section>
+
+<section id="techniki">
+ <h2>Techniki</h2>
+ <p class="lead">Kolejność na każdej figurce: podkład, baza, wash, drybrush, światła na krawędziach, lakier.</p>
+ <div class="grid2" id="tech"></div>
+</section>
+
+<section id="druk">
+ <h2>Ustawienia A1 mini do figurek</h2>
+ <p class="lead">Bambu Studio, PLA. Wybierz dyszę, którą masz założoną.</p>
+ <div class="seg" role="group" aria-label="Dysza"><button id="n04" aria-pressed="true">Dysza 0,4 mm</button><button id="n02" aria-pressed="false">Dysza 0,2 mm</button></div>
+ <div class="list" id="nset"></div>
+ <div class="tip" id="nnote"></div>
+ <div class="card" style="margin-top:14px">
+  <h3>Gotowy projekt z Bambu Handy</h3>
+  <p>W Handy drukujesz profil tak, jak zapisał go autor: wybierasz tylko drukarkę, płytę i filament. Warstwy, podpór ani wypełnienia tam nie zmienisz.</p>
+  <p>Żeby zmienić ustawienia: na MakerWorld kliknij <b>Open in Bambu Studio</b> (albo pobierz plik 3MF), zmień drukarkę i ustawienia, pokrój i wyślij do drukarki ze Studia.</p>
+  <p><b>Uwaga przy dyszy 0,2:</b> profil zrobiony pod 0,4 wydrukowany na dyszy 0,2 wyjdzie źle. Przekrój go w Studiu z drukarką „A1 mini 0.2 nozzle”. Po zmianie dyszy ustaw jej rozmiar też w drukarce i w Studiu.</p>
+ </div>
+ <h2 class="secth">Kalkulator skali</h2>
+ <p class="lead">Żeby figurki z różnych projektów pasowały do siebie wzrostem.</p>
+ <div class="card" style="margin-top:12px">
+  <label class="fl" for="scl">Skala docelowa</label>
+  <select id="scl"><option value="64">28 mm (1:64)</option><option value="56" selected>32 mm (1:56)</option><option value="51">35 mm (1:51)</option><option value="33">54 mm (1:33)</option><option value="24">75 mm (1:24)</option><option value="10">Popiersie / duża 1:10</option></select>
+  <div class="two">
+   <div><label class="fl" for="sre">Wzrost postaci (cm)</label><input id="sre" type="number" inputmode="decimal" value="185" min="20" max="2000"></div>
+   <div><label class="fl" for="smm">Wysokość modelu w Studiu (mm)</label><input id="smm" type="number" inputmode="decimal" value="120" min="1" max="1000"></div>
+  </div>
+  <div class="scres"><div><span>Docelowa wysokość</span><b id="sh">—</b></div><div><span>Skala w Bambu Studio</span><b id="sp">—</b></div></div>
+  <p class="note">Wysokość modelu mierz bez podstawki: zaznacz model w Studiu i odczytaj wymiar Z. Wzrost Artura Morgana to około 185 cm, krasnoluda około 140 cm.</p>
+ </div>
+ <h2 class="secth">Wydruk z A1 mini do malowania</h2>
+ <p class="lead">Linie warstw usuwasz przed malowaniem, nie farbą.</p>
+ <div class="grid2" id="fdm"></div>
+ <h2 class="secth">Zenithal</h2>
+ <div class="card" style="margin-top:12px">
+  <svg viewBox="0 0 330 150" aria-hidden="true">
+   <defs><linearGradient id="z2" x1="0" y1="1" x2="0" y2="0"><stop offset=".45" stop-color="#1a1a1a"/><stop offset="1" stop-color="#8a8a8a"/></linearGradient>
+   <linearGradient id="z3" x1="0" y1="1" x2="0" y2="0"><stop offset=".1" stop-color="#141414"/><stop offset="1" stop-color="#f2f2f2"/></linearGradient>
+   <path id="fig" d="M-22 130 L22 130 L28 62 L12 48 L12 40 L16 24 L8 10 L-8 10 L-16 24 L-12 40 L-12 48 L-28 62Z"/></defs>
+   <use href="#fig" x="55" fill="#1a1a1a"/><use href="#fig" x="165" fill="url(#z2)"/><use href="#fig" x="275" fill="url(#z3)"/>
+   <path d="M12 80h18M98 80H80" stroke="currentColor" stroke-width="3"/>
+   <path d="M118 6l28 24M212 6l-28 24" stroke="#d4a600" stroke-width="4"/>
+   <text x="55" y="147" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">1 czarny</text>
+   <text x="165" y="147" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">2 biały z góry</text>
+   <text x="275" y="147" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">3 efekt</text>
+  </svg>
+  <p>Czarny ze wszystkich stron, a gdy wyschnie — biały lub jasnoszary krótkimi seriami z góry pod kątem ok. 45°. Od razu widać, gdzie będą światła i cienie.</p>
+ </div>
+ <h2 class="secth">Mokra paleta — zrób ją sam</h2>
+ <div class="card" style="margin-top:12px">
+  <svg viewBox="0 0 320 110" aria-hidden="true">
+   <rect x="6" y="20" width="308" height="84" rx="12" fill="#d8d2ca" stroke="#9a9088"/>
+   <rect x="18" y="52" width="284" height="34" fill="#9cc6e0"/>
+   <rect x="18" y="46" width="284" height="6" fill="#f4ebdd" stroke="#c9bdaa" stroke-width=".6"/>
+   <g id="dr"></g>
+   <g font-size="13" font-weight="700" fill="#fff" text-anchor="middle">
+    <circle cx="290" cy="96" r="10" fill="#b8202a"/><text x="290" y="100">1</text>
+    <circle cx="290" cy="70" r="10" fill="#b8202a"/><text x="290" y="74">2</text>
+    <circle cx="300" cy="44" r="10" fill="#b8202a"/><text x="300" y="48">3</text>
+    <circle cx="300" cy="14" r="10" fill="#b8202a"/><text x="300" y="18">4</text>
+   </g>
+  </svg>
+  <p><b>1</b> pudełko z pokrywką · <b>2</b> mokry ręcznik papierowy lub gąbka · <b>3</b> papier do pieczenia przyciśnięty do mokrego · <b>4</b> krople farby. Farba nie zasycha godzinami.</p>
+ </div>
+ <h2 class="secth">Trzy błędy z kolorem</h2>
+ <div class="grid2" id="errs"></div>
+</section>
+
+<section id="zakupy">
+ <h2>Zakupy</h2>
+ <p class="lead">Zaznaczenia zapamiętują się w tej przeglądarce.</p>
+ <div class="warn"><b>Klej Revell Contacta nie skleja PLA</b> — to klej do polistyrenu. Do wydruków weź cyjanoakryl (superglue) w żelu.</div>
+ <div class="gen" style="margin-top:14px"><button id="keep" class="prim">Kopiuj listę do Google Keep</button></div>
+ <p class="note" id="keepmsg" role="status"></p><textarea id="keeptxt" rows="5" hidden></textarea>
+ <h3 class="secth">Kończy się</h3>
+ <div class="list" id="lowl"></div>
+ <h3 class="secth">Do kupienia</h3>
+ <div class="list" id="buy"></div>
+ <h3 class="secth">Już masz</h3>
+ <div class="list" id="have"></div>
+</section>
+</div>
+
+<div id="tb" hidden>
+ <div class="tbtop"><b id="tbname"></b><button id="tbx" aria-label="Zamknij">×</button></div>
+ <p class="tbstep" id="tbstep"></p>
+ <div id="tbbody"></div>
+ <div class="tbnav"><button id="tbprev">← Wstecz</button><button id="tbnext" class="prim">Gotowe, dalej →</button></div>
+</div>
+<script>
+{
+const P={"Gory Red":"#8b1c22","Scarlet Blood":"#b8202a","Hot Orange":"#e8701e","Moon Yellow":"#f2c230","Ivory":"#f2e8d2","Yellow Green":"#a8c94a","Lime Green":"#c8dc4a","Scorpy Green":"#5e9b3a","Cayman Green":"#2f6b3b","Dark Green":"#1f3b26","Glorious Gold":"#b08a2e","Tinny Tin":"#8a5a34","Aquamarine":"#1e9a90","Gorgon Brown":"#5e3a22","Earth":"#9c7445","Chainmail":"#a9adb1","Stonewall Grey":"#7c7f82","Bone White":"#cdbf98","wash Umber":"#5a3b22","wash Black":"#262626","Black":"#141414","Magic Blue":"#2456a8","Off White":"#f1efe6","Wolf Grey":"#9aabbd","Basic Skintone":"#e5b18e"};
+// [rola, kolor wyniku, mieszanka [[farba, krople]], uwaga]
+const M=[
+ {n:"Czerwień",w:"płaszcz, tkanina, sztandar",s:[["#5e1a1a",[["Gory Red",2],["Gorgon Brown",1]],"fałdy i spód"],["#8b1c22",[["Gory Red",1]],"cała powierzchnia"],["#b8202a",[["Scarlet Blood",1]],"górne części fałd"],["#da4a2a",[["Scarlet Blood",2],["Hot Orange",1]],"grzbiety fałd, punktowo"]]},
+ {n:"Zieleń",w:"skóra orka lub goblina",s:[["#1f3b26",[["Dark Green",1]],"zagłębienia, pod brodą"],["#2f6b3b",[["Cayman Green",1]],"cała skóra"],["#5e9b3a",[["Scorpy Green",1]],"czoło, policzki, mięśnie"],["#a8c94a",[["Yellow Green",1]],"kostki, nos; Lime Green na sam czubek"]]},
+ {n:"Skóra",w:"twarz i dłonie człowieka",s:[["#9a5f3e",[["wash Umber",1]],"wash po bazie, oczodoły, pod nosem"],["#e5b18e",[["Basic Skintone",1]],"cała skóra"],["#efcbb0",[["Basic Skintone",2],["Off White",1]],"czoło, nos, kości policzkowe"],["#f5e2d2",[["Basic Skintone",1],["Off White",1]],"czubek nosa, kostki, punktowo"]]},
+ {n:"Niebieski",w:"płaszcz, szata, pancerz",s:[["#1b3570",[["Magic Blue",2],["Black",1]],"fałdy i spód"],["#2456a8",[["Magic Blue",1]],"cała powierzchnia"],["#6a8fc0",[["Magic Blue",1],["Wolf Grey",1]],"górne części fałd"],["#a9bccf",[["Wolf Grey",1]],"krawędzie, punktowo"]]},
+ {n:"Czarny",w:"kamizelka, buty, kapelusz",s:[["#0e0e0e",[["Black",1]],"najgłębsze fałdy"],["#2a2b2d",[["Black",2],["Stonewall Grey",1]],"cała powierzchnia"],["#4a4c4f",[["Black",1],["Stonewall Grey",1]],"wypukłości"],["#7c7f82",[["Stonewall Grey",1]],"tylko ostre krawędzie"]]},
+ {n:"Biały",w:"koszula, bandaże, sierść",s:[["#7f8e9e",[["Wolf Grey",1],["Stonewall Grey",1]],"fałdy"],["#c8d1da",[["Wolf Grey",1],["Off White",2]],"cała powierzchnia"],["#e6e8e6",[["Off White",1]],"wypukłości"],["#fbfaf5",[["Off White",1]],"druga warstwa na krawędziach"]]},
+ {n:"Złoto",w:"zbroja, ozdoby, klamry",s:[["#5c4220",[["wash Umber",1]],"wash na całe złoto"],["#b08a2e",[["Glorious Gold",1]],"baza"],["#cfb462",[["Glorious Gold",2],["Chainmail",1]],"wypukłości"],["#c9cbcc",[["Chainmail",1]],"tylko ostre krawędzie"]]},
+ {n:"Stal",w:"miecze, kolczuga, nity",s:[["#2e3033",[["wash Black",1]],"wash, spływa w kolczugę"],["#9ea2a6",[["Chainmail",1]],"baza"],["#b9bdc0",[["Chainmail",1]],"druga warstwa na wypukłych"],["#dadddf",[["Chainmail",1]],"cienka linia na krawędzi ostrza"]]},
+ {n:"Brąz",w:"miedź, stare okucia",s:[["#4a3020",[["wash Umber",1]],"wash"],["#8a5a34",[["Tinny Tin",1]],"baza"],["#a8783c",[["Tinny Tin",1],["Glorious Gold",1]],"wypukłości"],["#b08a2e",[["Glorious Gold",1]],"krawędzie"]]},
+ {n:"Skóra (pasy)",w:"pasy, buty, sakwy",s:[["#3b2416",[["wash Umber",1]],"wash"],["#5e3a22",[["Gorgon Brown",1]],"baza"],["#7e5634",[["Gorgon Brown",1],["Earth",1]],"wypukłości"],["#9c7445",[["Earth",1]],"rysy i otarcia na brzegach"]]},
+ {n:"Drewno",w:"drzewce, tarcze, skrzynie",s:[["#4a3020",[["wash Umber",1]],"wash w słoje"],["#8a6238",[["Earth",1]],"baza"],["#ae8e62",[["Earth",2],["Bone White",1]],"kreski wzdłuż słojów"],["#cdbf98",[["Bone White",1]],"kilka cienkich kresek"]]},
+ {n:"Kość",w:"czaszki, rogi, len, pergamin",s:[["#8c7550",[["wash Umber",1]],"wash"],["#cdbf98",[["Bone White",1]],"baza"],["#e0d6b8",[["Bone White",1],["Ivory",1]],"wypukłości"],["#f2e8d2",[["Ivory",1]],"krawędzie i czubki"]]},
+ {n:"Kamień",w:"podstawki, mury, skały",s:[["#3a3c3f",[["wash Black",1]],"wash w szczeliny"],["#7c7f82",[["Stonewall Grey",1]],"baza"],["#a8a497",[["Stonewall Grey",1],["Bone White",1]],"drybrush"],["#cdbf98",[["Bone White",1]],"lekki drybrush na krawędzie"]]},
+ {n:"Magia",w:"klejnoty, runy, energia",s:[["#145b55",[["Aquamarine",2],["Dark Green",1]],"dół klejnotu"],["#1e9a90",[["Aquamarine",1]],"baza"],["#7ccfc4",[["Aquamarine",1],["Ivory",1]],"górna połowa"],["#f2e8d2",[["Ivory",1]],"jedna kropka odblasku"]]},
+ {n:"Ogień",w:"płomienie, lawa, świecące oczy",s:[["#8b1c22",[["Gory Red",1]],"zewnętrzne brzegi"],["#e8701e",[["Hot Orange",1]],"środek płomienia"],["#f2c230",[["Moon Yellow",1]],"wnętrze"],["#f2e8d2",[["Ivory",1]],"samo serce ognia"]]}
+];
+const ROLE=["Cień","Baza","Światło","Błysk"],ORDER=[2,1,3,4];
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+function sphere(c,r=90,cx=100,cy=100,id="s"){
+ return `<defs><clipPath id="${id}c"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath></defs>
+ <ellipse cx="${cx+r*.05}" cy="${cy+r*1.02}" rx="${r*.85}" ry="${r*.12}" fill="currentColor" opacity=".12"/>
+ <g clip-path="url(#${id}c)"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${c[0]}"/>
+ <ellipse cx="${cx}" cy="${cy-r*.18}" rx="${r*.98}" ry="${r*.86}" fill="${c[1]}"/>
+ <ellipse cx="${cx}" cy="${cy-r*.42}" rx="${r*.66}" ry="${r*.5}" fill="${c[2]}"/>
+ <ellipse cx="${cx}" cy="${cy-r*.62}" rx="${r*.26}" ry="${r*.18}" fill="${c[3]}"/></g>`;
+}
+$("rack").innerHTML=["#8b1c22","#e8701e","#f2c230","#2f6b3b","#1e9a90","#5e3a22","#cdbf98"].map(c=>`<i style="background:${c}"></i>`).join("");
+
+let own=store.get("own",{});
+let prog=store.get("prog",{});
+const SUB={"Black":"wash Black w 2–3 warstwach albo Gorgon Brown + Dark Green","Off White":"Ivory","Ivory":"Off White + kropla Bone White","Magic Blue":"Aquamarine + kropla Black (bardziej turkusowy)","Wolf Grey":"Stonewall Grey + Off White + kropla Magic Blue","Basic Skintone":"Ivory 4 + Hot Orange 1 + Gorgon Brown 1","Bone White":"Ivory + kropla Earth","Earth":"Gorgon Brown + Bone White","Gorgon Brown":"Earth + kropla Black","Stonewall Grey":"Black + Off White 1:1","Chainmail":"Tinny Tin (ciemniejszy metal)","Glorious Gold":"Tinny Tin (ciemniejszy)","Tinny Tin":"Glorious Gold + wash Umber","Gory Red":"Scarlet Blood + kropla Black","Scarlet Blood":"Gory Red + kropla Hot Orange","Hot Orange":"Scarlet Blood + Moon Yellow","Moon Yellow":"Ivory + kropla Hot Orange","Yellow Green":"Lime Green","Lime Green":"Yellow Green + Moon Yellow","Scorpy Green":"Cayman Green + Yellow Green","Cayman Green":"Dark Green + Scorpy Green","Dark Green":"Cayman Green + kropla Black","Aquamarine":"Magic Blue + Cayman Green","wash Umber":"Gorgon Brown + Glaze Medium 1:6","wash Black":"Black + Glaze Medium 1:6"};
+let cur=store.get("mat",0);if(!M[cur])cur=0;
+function chips(){$("chips").innerHTML=M.map((m,i)=>`<button class="chip" aria-pressed="${i===cur}" data-i="${i}"><b style="background:radial-gradient(circle at 50% 30%,${m.s[3][0]},${m.s[1][0]} 55%,${m.s[0][0]})"></b>${m.n}</button>`).join("")}
+function show(){
+ const m=M[cur];chips();
+ $("sphere").innerHTML=sphere(m.s.map(x=>x[0]));
+ $("mname").textContent=m.n;$("mwhere").textContent=m.w;
+ const idx=[1,0,2,3];
+ $("steps").innerHTML=idx.map(k=>{const [c,mix,where]=m.s[k];
+  const drops=mix.map(([p,n],j)=>(j?"<em>+</em>":"")+Array.from({length:n},()=>`<i style="background:${P[p]}" title="${p}"></i>`).join("")).join("");
+  const txt=mix.map(([p,n])=>(mix.length>1?n+"× ":"")+p+(own[p]===false?'<em class="no">brak</em>':"")).join(" + ");const miss=mix.filter(([p])=>own[p]===false).map(([p])=>`<div class="sub">Zamiast ${p}: ${SUB[p]||"podobny kolor z palety"}</div>`).join("");
+  return `<div class="step"><div class="sw" style="background:${c}"><span>${ORDER[k]}</span></div><div><div class="role">${ROLE[k]}</div><div class="mix">${txt}</div><div class="drops">${drops}</div><div class="note">${where}</div>${miss}</div></div>`}).join("");
+}
+$("chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;cur=+b.dataset.i;store.set("mat",cur);show()});
+show();
+
+// ustawienia drukarki
+const NS={
+ "04":[["Drukarka w Studiu","A1 mini 0.4 nozzle"],["Wysokość warstwy","0,12 mm (detale 0,08)"],["Pierwsza warstwa","0,2 mm"],["Szerokość linii","domyślna (0,42)"],["Ściany","3"],["Góra / dół","5 / 4 warstwy"],["Wypełnienie","10–15%, gyroid"],["Prędkość ściany zewn.","60–100 mm/s"],["Zwolnij na nawisach","włączone"],["Podpory","drzewkowe (tree), auto"],["Kąt podpór","30–35°"],["Szew (seam)","z tyłu lub wyrównany"],["Ironing","wyłączone"],["Temperatura","wg profilu filamentu"]],
+ "02":[["Drukarka w Studiu","A1 mini 0.2 nozzle"],["Wysokość warstwy","0,08 mm (detale 0,06)"],["Pierwsza warstwa","0,1 mm"],["Szerokość linii","domyślna (ok. 0,22)"],["Ściany","4"],["Góra / dół","7 / 6 warstw"],["Wypełnienie","10–15%, gyroid"],["Prędkość ściany zewn.","40–60 mm/s"],["Zwolnij na nawisach","włączone"],["Podpory","drzewkowe (tree), auto"],["Kąt podpór","30°"],["Szew (seam)","z tyłu lub wyrównany"],["Ironing","wyłączone"],["Temperatura","wg profilu filamentu"]]};
+const NN={"04":"Szybki druk większych figurek. Linie warstw będą widoczne, więc licz się z fillerem.","02":"Druk trwa kilka razy dłużej, ale linii prawie nie widać. Używaj suchego, czystego PLA, bez dodatków (glitter, drewno, węgiel)."};
+let nz=store.get("nozzle","04");
+function showN(){$("nset").innerHTML=NS[nz].map(([a,b])=>`<div class="row"><span>${a}</span><b>${b}</b></div>`).join("");$("nnote").innerHTML="<b>Dysza "+(nz==="04"?"0,4":"0,2")+":</b> "+NN[nz];$("n04").setAttribute("aria-pressed",nz==="04");$("n02").setAttribute("aria-pressed",nz==="02")}
+$("n04").onclick=()=>{nz="04";store.set("nozzle",nz);showN()};$("n02").onclick=()=>{nz="02";store.set("nozzle",nz);showN()};
+showN();
+
+// figurki
+const F2=[
+ {n:"Artur Morgan",d:"Kowboj z Red Dead Redemption 2: stonowane, zakurzone kolory. Wszystko matowe poza metalem.",p:[
+  ["Skóra twarzy i dłoni",["#9a5f3e","#e5b18e","#efcbb0"],"Basic Skintone, wash Umber, światła Basic Skintone + Off White"],
+  ["Zarost",["#3b2a20","#4a3428","#5e3a22"],"Gorgon Brown + kropla Black, z Glaze Medium 1:8, 3–4 warstwy"],
+  ["Kapelusz",["#1e1510","#3a2618","#6e5032"],"Gorgon Brown + Black 1:1, światła Gorgon + Earth na rondzie"],
+  ["Koszula",["#4f6478","#9aabbd","#c8d1da"],"Wolf Grey, cień Wolf Grey + Magic Blue, światła + Off White"],
+  ["Kamizelka",["#0e0e0e","#2a2b2d","#4a4c4f"],"Black + Stonewall Grey 2:1, wash Black, światła 1:1"],
+  ["Spodnie",["#2c2219","#4b3c30","#6c5a48"],"Gorgon Brown + Stonewall Grey 1:1, wash Umber"],
+  ["Pasy, kabura, torba",["#3b2416","#5e3a22","#9c7445"],"Gorgon Brown, wash Umber, rysy Earth"],
+  ["Buty",["#0e0e0e","#24180f","#4a3a2c"],"Black + Gorgon Brown 1:1, światła Stonewall Grey"],
+  ["Rewolwer",["#262626","#a9adb1","#dadddf"],"Chainmail, wash Black, krawędzie Chainmail; rękojeść Bone White"],
+  ["Podstawka",["#6b5134","#9c7445","#cdbf98"],"AK Dark and Dry Crackle (pustynna ziemia), drybrush Bone White"]],
+  k:["Podkład: Tamiya szary, potem czarny Vallejo i biały z góry (zenithal).","Bazy od środka na zewnątrz: skóra, koszula, kamizelka i spodnie, potem pasy, kapelusz i buty.","Wash Umber na skórę, pasy i spodnie; wash Black na kamizelkę i rewolwer.","Światła: ronda kapelusza, ramiona, fałdy koszuli, krawędzie kamizelki.","Twarz: oczy ciemną kreską zamiast białek, zarost glazami, lekki rumieniec Gory Red 1:8 na nos i policzki.","Podstawka z AK Dark and Dry, a na koniec lakier matowy AK Ultra Matt."],
+  t:"Arturowi pasuje „brudny” wygląd: na koniec lekki drybrush Earth na dole spodni i butów udaje kurz."},
+ {n:"Rycerz",d:"Lśniąca zbroja płytowa, tabard w barwach herbu i złote zdobienia.",p:[
+  ["Zbroja",["#262626","#a9adb1","#dadddf"],"Chainmail, wash Black, krawędzie Chainmail"],
+  ["Tabard",["#5e1a1a","#8b1c22","#b8202a"],"Gory Red, cień + Gorgon Brown, światła Scarlet Blood"],
+  ["Płaszcz",["#1b3570","#2456a8","#6a8fc0"],"Magic Blue, cień + Black, światła + Wolf Grey"],
+  ["Zdobienia",["#5c4220","#b08a2e","#cfb462"],"Glorious Gold, wash Umber, światła + Chainmail"],
+  ["Pasy i rękojeść",["#3b2416","#5e3a22","#7e5634"],"Gorgon Brown, wash Umber"],
+  ["Pióropusz",["#7f8e9e","#c8d1da","#fbfaf5"],"Wolf Grey + Off White, wash Black, Off White"]],
+  k:["Podkład czarny Vallejo: metal wyjdzie głębszy.","Metal: Chainmail na całą zbroję, potem wash Black.","Tkaniny: tabard i płaszcz według drabinek z działu Przepisy.","Złoto na końcu, cienkim pędzlem 3/0.","Krawędzie zbroi Chainmail: jedna cienka linia na każdej płycie."],
+  t:"Na zbroi nie używaj drybrushu, bo wychodzi kredowo. Na płytach sprawdza się tylko wash i krawędzie."},
+ {n:"Szkielet",d:"Popularne nieumarłe wojsko: szybki do malowania, dobry na naukę washy.",p:[
+  ["Kości",["#8c7550","#cdbf98","#f1efe6"],"Bone White, wash Umber, drybrush Bone White + Off White"],
+  ["Zardzewiała broń",["#4a3020","#8a5a34","#e8701e"],"Tinny Tin, wash Umber, glaze Hot Orange jako rdza"],
+  ["Tarcza drewniana",["#4a3020","#8a6238","#ae8e62"],"Earth, wash Umber, kreski Earth + Bone White"],
+  ["Szmaty",["#2c2219","#4b3c30","#7c7f82"],"Gorgon Brown + Stonewall Grey, wash Black"],
+  ["Świecące oczy",["#145b55","#1e9a90","#f2e8d2"],"Aquamarine, środek Ivory, glaze Aquamarine wokół oczodołu"]],
+  k:["Podkład: biały z góry na czarnym, bo kości są jasne.","Bone White na wszystkie kości, potem wash Umber na całość.","Po wyschnięciu drybrush Bone White, a na najwyższe miejsca Off White.","Broń i tarcza, potem rdza: glaze Hot Orange w zagłębieniach.","Oczy na końcu."],
+  t:"Wash Umber robi tu większość roboty: nie zbieraj go z płaskich miejsc, kości mają być brudne."},
+ {n:"Ork",d:"Zielona skóra, ciężkie metalowe płyty i dużo charakteru.",p:[
+  ["Skóra",["#1f3b26","#2f6b3b","#5e9b3a"],"Cayman Green, cień Dark Green, światła Scorpy, potem Yellow Green"],
+  ["Zbroja",["#262626","#a9adb1","#e8701e"],"Chainmail, wash Black, rdza glaze Hot Orange"],
+  ["Spodnie",["#3b2416","#5e3a22","#7e5634"],"Gorgon Brown, wash Umber"],
+  ["Zęby i kły",["#8c7550","#cdbf98","#f1efe6"],"Bone White, wash Umber, czubek Off White"],
+  ["Oczy",["#5e1a1a","#b8202a","#e8701e"],"Gory Red, środek Hot Orange"]],
+  k:["Podkład czarny i zenithal.","Skóra według drabinki Zieleń; to największa powierzchnia, więc maluj pędzlem 3.","Metal i wash Black.","Spodnie, pasy, zęby.","Światła na mięśniach: barki, kostki palców, łuki brwiowe.","Oczy i rdza na końcu."],
+  t:"Glaze Gory Red 1:8 na nos i uszy sprawia, że zielona skóra wygląda żywo."},
+ {n:"Goblin",d:"Mały, chudy, jaśniejsza zieleń niż ork, często w łachmanach.",p:[
+  ["Skóra",["#2f6b3b","#5e9b3a","#a8c94a"],"Scorpy Green, cień Cayman Green, światła Yellow Green"],
+  ["Uszy i nos",["#8b1c22","#b8202a","#da4a2a"],"glaze Gory Red 1:8 na końcówki uszu i nos"],
+  ["Łachmany",["#4a3020","#9c7445","#cdbf98"],"Earth, wash Umber, światła + Bone White"],
+  ["Nóż lub włócznia",["#262626","#a9adb1","#dadddf"],"Chainmail, wash Black"],
+  ["Oczy",["#8a6a2a","#f2c230","#f2e8d2"],"Moon Yellow, źrenica Black"]],
+  k:["Zenithal.","Skóra Scorpy Green, wash Umber dla brudu.","Światła Yellow Green na nosie, uszach, kościach.","Glaze czerwony na uszach.","Łachmany, broń, oczy."],
+  t:"Żółte oczy na zielonej skórze to kolory sąsiednie: wyglądają naturalnie i drapieżnie."},
+ {n:"Smok",d:"Najczęściej drukowana figurka na FDM, także wersje ruchome (articulated).",p:[
+  ["Łuski grzbietu",["#5e1a1a","#8b1c22","#e8701e"],"Gory Red, wash Black, drybrush Scarlet Blood, potem Hot Orange"],
+  ["Brzuch",["#8c7550","#cdbf98","#f2e8d2"],"Bone White, wash Umber, światła Ivory"],
+  ["Rogi i pazury",["#0e0e0e","#4a4c4f","#cdbf98"],"Black, przejście do Bone White na czubkach"],
+  ["Błony skrzydeł",["#5e1a1a","#b8202a","#da4a2a"],"Scarlet Blood rozcieńczony, ciemniej przy kościach"],
+  ["Oczy",["#8a6a2a","#f2c230","#f2e8d2"],"Moon Yellow, pionowa źrenica Black"]],
+  k:["Podkład czarny na całość.","Gory Red na grzbiet i skrzydła, Bone White na brzuch.","Wash Black na łuski: wpłynie między nie.","Drybrush łusek: najpierw Scarlet Blood, potem lekko Hot Orange tylko na grzbiecie.","Rogi i pazury od ciemnego do jasnego czubka.","Oczy i lakier."],
+  t:"Przy smoku ruchomym nie maluj wnętrz przegubów i ruszaj nim, gdy schnie lakier, inaczej segmenty się skleją."},
+ {n:"Krasnolud",d:"Ruda broda, hełm, złoto i ciepłe, ziemiste kolory.",p:[
+  ["Broda ruda",["#5e3a22","#c0601e","#f2c230"],"Hot Orange + Gorgon Brown, wash Umber, drybrush Hot Orange + Moon Yellow"],
+  ["Skóra",["#9a5f3e","#e5b18e","#efcbb0"],"Basic Skintone, wash Umber"],
+  ["Hełm i kolczuga",["#262626","#a9adb1","#dadddf"],"Chainmail, wash Black"],
+  ["Ubranie",["#1b3570","#2456a8","#a9bccf"],"Magic Blue, cień + Black, światła Wolf Grey"],
+  ["Zdobienia",["#5c4220","#b08a2e","#cfb462"],"Glorious Gold, wash Umber"],
+  ["Topór i pasy",["#3b2416","#5e3a22","#9c7445"],"Gorgon Brown, rysy Earth"]],
+  k:["Zenithal.","Skóra i ubranie.","Metal i wash.","Broda: baza, wash, potem drybrush, bo broda ma fakturę.","Złoto, pasy, oczy."],
+  t:"Niebieskie ubranie przy rudej brodzie to kolory dopełniające, broda będzie wyglądać mocniej."},
+ {n:"Elf łucznik",d:"Leśne zielenie, jasna skóra i jasne włosy.",p:[
+  ["Płaszcz",["#1f3b26","#2f6b3b","#5e9b3a"],"Cayman Green, cień Dark Green, światła Scorpy Green"],
+  ["Skóra",["#c99a7a","#efcbb0","#f5e2d2"],"Basic Skintone + Off White 2:1, blada cera"],
+  ["Włosy blond",["#8a6a2a","#e0c070","#f1efe6"],"Moon Yellow + Bone White, wash Umber, światła Off White"],
+  ["Łuk",["#4a3020","#8a6238","#ae8e62"],"Earth, wash Umber, kreski słojów"],
+  ["Skórzana zbroja",["#3b2416","#5e3a22","#7e5634"],"Gorgon Brown, wash Umber"]],
+  k:["Zenithal z mocnym białym.","Płaszcz, skóra, włosy.","Wash Umber na skórzane elementy i włosy.","Światła i krawędzie płaszcza.","Łuk i strzały, cięciwa Off White cienkim pędzlem."],
+  t:"Elfy wyglądają lepiej, gdy skóra jest jaśniejsza niż u ludzi: baza już z dodatkiem Off White."},
+ {n:"Czarodziej",d:"Długa szata, broda, kostur i świecący kryształ.",p:[
+  ["Szata",["#1b3570","#2456a8","#6a8fc0"],"Magic Blue, cień + Black, światła + Wolf Grey"],
+  ["Broda i włosy",["#4a4c4f","#9aabbd","#f1efe6"],"Stonewall Grey, wash Black, drybrush Wolf Grey, potem Off White"],
+  ["Kostur",["#4a3020","#8a6238","#ae8e62"],"Earth, wash Umber"],
+  ["Kryształ",["#145b55","#1e9a90","#f2e8d2"],"Aquamarine, góra + Ivory, kropka odblasku"],
+  ["Poświata",["#1e9a90","#7ccfc4","#f2e8d2"],"glaze Aquamarine 1:6 na dłoń i brodę obok kryształu"]],
+  k:["Zenithal.","Szata według drabinki Niebieski.","Broda drybrushem.","Kostur i dłonie.","Kryształ na końcu, potem poświata glazami."],
+  t:"Poświata (OSL) działa tylko na powierzchniach zwróconych do kryształu. Nie maluj jej po drugiej stronie."},
+ {n:"Zombie",d:"Szarozielona skóra, podarte ubranie, rany.",p:[
+  ["Skóra",["#4a5040","#8a9178","#b9bfa8"],"Stonewall Grey + Scorpy Green 2:1, wash Umber, światła + Off White"],
+  ["Rany",["#2a0c0e","#5e1a1a","#8b1c22"],"Gory Red + Black, środek Gory Red, glaze wokół rany"],
+  ["Ubranie",["#2c2219","#4b3c30","#7c7f82"],"Gorgon Brown + Stonewall Grey, wash Black"],
+  ["Koszula",["#7f8e9e","#c8d1da","#e6e8e6"],"Wolf Grey + Off White, plamy wash Umber"],
+  ["Oczy",["#cdbf98","#f1efe6","#f1efe6"],"Off White z kroplą Bone White, bez źrenic"]],
+  k:["Zenithal.","Skóra, a wokół oczu i ust wash Umber mocniej.","Ubrania i plamy brudu.","Rany: najpierw ciemny środek, potem czerwone brzegi.","Oczy i lakier matowy."],
+  t:"Glaze Magic Blue 1:8 pod oczami i na palcach daje trupi, sinawy odcień."},
+ {n:"Żołnierz sci-fi",d:"Pancerz wspomagany, duże gładkie płyty i świecące soczewki.",p:[
+  ["Pancerz",["#1b3570","#2456a8","#a9bccf"],"Magic Blue, wash Black w szczeliny, krawędzie Wolf Grey"],
+  ["Elementy metalowe",["#262626","#a9adb1","#dadddf"],"Chainmail, wash Black"],
+  ["Soczewki",["#5e1a1a","#b8202a","#f2e8d2"],"Gory Red, dół Hot Orange, kropka Off White u góry"],
+  ["Pasy i sakwy",["#3b2416","#5e3a22","#7e5634"],"Gorgon Brown, wash Umber"],
+  ["Ozdoby",["#5c4220","#b08a2e","#cfb462"],"Glorious Gold, wash Umber"]],
+  k:["Na FDM najważniejszy jest tu filler: duże płyty pokazują każdą linię warstw.","Podkład czarny.","Pancerz Magic Blue w 2–3 cienkich warstwach.","Wash Black tylko w szczeliny między płytami (pin wash), nie na całość.","Krawędzie Wolf Grey, metal, soczewki, ozdoby."],
+  t:"Gładkie płyty to idealne miejsce na Tamiya Liquid Surface Primer przed malowaniem."},
+ {n:"Popiersie",d:"Duża głowa i ramiona. Najlepsza figurka, żeby nauczyć się twarzy.",p:[
+  ["Skóra",["#9a5f3e","#e5b18e","#f5e2d2"],"Basic Skintone, glazy cieni i świateł"],
+  ["Policzki i usta",["#8b1c22","#b8202a","#d98880"],"glaze Gory Red 1:8"],
+  ["Oczy",["#141414","#f1efe6","#2456a8"],"Off White białko, tęczówka Magic Blue, źrenica Black"],
+  ["Włosy",["#1e1510","#3a2618","#6e5032"],"Gorgon Brown + Black, światła + Earth"],
+  ["Ubranie",["#0e0e0e","#2a2b2d","#4a4c4f"],"Black + Stonewall Grey"]],
+  k:["Zenithal: na dużej twarzy od razu widać światło.","Skóra bazowo, potem glazy: cienie pod brwiami, nosem i brodą.","Światła glazami: czoło, grzbiet nosa, kości policzkowe.","Oczy: białko trochę szarsze niż Off White, tęczówka dotyka górnej powieki.","Włosy i ubranie, potem lakier."],
+  t:"Na popiersiu glazy dają najwięcej: maluj twarz 5–10 cienkimi warstwami zamiast 2 grubymi."}
+];
+const BASEN=F2.length;let custom=store.get("custom",[]);custom.forEach(c=>F2.push(c));
+let fcur=store.get("fig",0);if(!F2[fcur])fcur=0;
+function showFig(){
+ $("fchips").innerHTML=F2.map((f,i)=>`<button class="chip" aria-pressed="${i===fcur}" data-i="${i}"><b style="background:linear-gradient(135deg,${(f.p[0]||[0,["#999","#999"]])[1][1]} 50%,${(f.p[1]||f.p[0]||[0,["#999","#999"]])[1][1]} 50%)"></b>${f.n.replace(/</g,"&lt;")}</button>`).join("")+'<button class="chip" data-add="1"><b style="background:var(--line)"></b>+ Własna</button>';
+ $("fedit").hidden=!F2[fcur].own;
+ const f=F2[fcur];$("fname").textContent=f.n;$("fdesc").textContent=f.d||"";
+ $("fparts").innerHTML=f.p.map(([n,c,t])=>`<div class="part"><div class="trio">${c.map(x=>`<i style="background:${x}"></i>`).join("")}</div><div><b>${n}</b><span>${t}</span></div></div>`).join("");
+ progRender(f);
+ $("ftip").innerHTML="<b>Wskazówka:</b> "+f.t;
+}
+$("fchips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;if(b.dataset.add){cfOpen(-1);return}fcur=+b.dataset.i;store.set("fig",fcur);showFig()});
+showFig();
+
+// koło barw
+const W=[["żółty","#f7d417"],["żółtopomarańczowy","#f5a623"],["pomarańczowy","#f07a1a"],["czerwonopomarańczowy","#e2471c"],["czerwony","#c8202b"],["czerwonofioletowy","#a3205e"],["fioletowy","#6b2c8c"],["niebieskofioletowy","#40368f"],["niebieski","#2456a8"],["niebieskozielony","#1c8c8c"],["zielony","#2e9445"],["żółtozielony","#9bc23a"]];
+let wsel=4;
+function wheel(){
+ const cx=120,cy=120,R=112,r=58,a=i=>(-90+i*30-15)*Math.PI/180;
+ let s="";
+ W.forEach(([n,c],i)=>{const a0=a(i),a1=a(i+1),p=(rr,t)=>`${cx+rr*Math.cos(t)} ${cy+rr*Math.sin(t)}`;
+  const on=i===wsel||i===(wsel+6)%12;
+  s+=`<path data-i="${i}" d="M${p(R,a0)} A${R} ${R} 0 0 1 ${p(R,a1)} L${p(r,a1)} A${r} ${r} 0 0 0 ${p(r,a0)}Z" fill="${c}" stroke="var(--bg)" stroke-width="${on?1:3}" opacity="${on?1:.55}" style="cursor:pointer"><title>${n}</title></path>`});
+ const o=(wsel+6)%12,t=i=>(-90+i*30)*Math.PI/180;
+ s+=`<line x1="${cx+54*Math.cos(t(wsel))}" y1="${cy+54*Math.sin(t(wsel))}" x2="${cx+40*Math.cos(t(wsel))}" y2="${cy+40*Math.sin(t(wsel))}" stroke="currentColor" stroke-width="2"/><line x1="${cx+54*Math.cos(t(o))}" y1="${cy+54*Math.sin(t(o))}" x2="${cx+40*Math.cos(t(o))}" y2="${cy+40*Math.sin(t(o))}" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>`;
+ s+=`<text x="${cx}" y="${cy-14}" text-anchor="middle" font-size="12" font-weight="700" fill="#c0601e">ciepłe ↑</text><text x="${cx}" y="${cy+24}" text-anchor="middle" font-size="12" font-weight="700" fill="#3a6fb5">zimne ↓</text>`;
+ $("wheel").innerHTML=s;
+ $("pair").innerHTML=`<b style="background:${W[wsel][1]}"></b>${W[wsel][0]} ↔ ${W[o][0]}<b style="background:${W[o][1]}"></b>`;
+ $("pairNote").textContent="Mały akcent w kolorze dopełniającym sprawi, że główny kolor będzie mocniejszy.";
+}
+$("wheel").addEventListener("click",e=>{const p=e.target.closest("path");if(!p)return;wsel=+p.dataset.i;wheel()});
+wheel();
+
+const T=[["Czerwony","#b8202a","#5e1a1a","brąz lub ciemny fiolet","#e05535","pomarańcz, potem krem","biel → róż"],["Niebieski","#2456a8","#162a5c","granat + fiolet","#7aa6dc","błękit, potem biel","za dużo czerni"],["Zielony","#2f6b3b","#1a3550","ciemny niebieski lub brąz","#a8c94a","żółty, potem jasna kość","biel → mięta"],["Żółty","#f2c230","#8a6a2a","ochra, brąz","#f6e4a8","krem lub kość","czerń → oliwka"],["Brązowy","#5e3a22","#2e1d12","ciemny brąz + czerń","#9c7445","ochra, kość","—"],["Szary","#7c7f82","#3a3f48","ciemny szary + niebieski","#c9cbcc","jasny szary, biel","czysta czerń"]];
+$("tones").innerHTML=T.map(([n,b,s,sn,l,ln,x])=>`<div class="card"><h3>${n}</h3><div class="tone"><div style="background:${s};color:#fff">cień<br>${sn}</div><div style="background:${b};color:${n==="Żółty"?"#1d1916":"#fff"}">baza</div><div style="background:${l};color:#1d1916">światło<br>${ln}</div></div>${x!=="—"?`<p>Unikaj: ${x}</p>`:""}</div>`).join("");
+
+// techniki
+const prof=(fill,extra="")=>`<path d="M10 70 Q25 40 40 70 Q55 40 70 70 Q85 40 100 70 Q115 40 130 70 Q145 40 160 70 Q175 40 190 70 V96 H10Z" fill="${fill}"/>${extra}`;
+const TE=[
+ ["Wash","Rzadki tusz spływa do zagłębień i robi cienie. Nadmiar z płaskich miejsc zbierz suchym pędzlem.",prof("#9ea2a6",`<path d="M32 63 Q40 72 48 63Z M62 63 Q70 72 78 63Z M92 63 Q100 72 108 63Z M122 63 Q130 72 138 63Z M152 63 Q160 72 168 63Z" fill="#262626"/>`)],
+ ["Drybrush","Suchy pędzel, farba wytarta o ręcznik, szybkie ruchy w poprzek. Łapie tylko wypukłości: futro, kolczuga, kamienie.",prof("#5e3a22",`<path d="M18 57 Q25 50 32 57 M48 57 Q55 50 62 57 M78 57 Q85 50 92 57 M108 57 Q115 50 122 57 M138 57 Q145 50 152 57 M168 57 Q175 50 182 57" stroke="#e0c592" stroke-width="5" fill="none" stroke-linecap="round"/>`)],
+ ["Layering","Coraz jaśniejsze warstwy na coraz mniejszym polu. Zawsze zostaw widoczny brzeg poprzedniej.",`<rect x="20" y="20" width="160" height="72" rx="10" fill="#7e161e"/><rect x="40" y="30" width="120" height="54" rx="9" fill="#b8222b"/><rect x="60" y="40" width="80" height="34" rx="8" fill="#e05535"/><rect x="80" y="49" width="40" height="15" rx="7" fill="#f6c49a"/>`],
+ ["Edge highlight","Najjaśniejszy odcień bokiem czubka pędzla tylko na ostrych krawędziach. Największy efekt za najmniej pracy.",`<path d="M50 40 H140 V90 H50Z" fill="#2f6b3b"/><path d="M50 40 L72 20 H162 L140 40Z" fill="#5e9b3a"/><path d="M140 40 L162 20 V70 L140 90Z" fill="#1f3b26"/><path d="M50 40 H140 L162 20 M140 40 V90" stroke="#d6ec84" stroke-width="3.5" fill="none" stroke-linecap="round"/>`],
+ ["Glazing","Farba z medium 1:5, prawie przezroczysta. Kilka warstw wygładza przejścia między odcieniami.",`<defs><linearGradient id="gl"><stop offset="0" stop-color="#7e161e"/><stop offset=".35" stop-color="#b8222b"/><stop offset=".7" stop-color="#e05535"/><stop offset="1" stop-color="#f6c49a"/></linearGradient></defs><rect x="20" y="18" width="40" height="28" fill="#7e161e"/><rect x="60" y="18" width="40" height="28" fill="#b8222b"/><rect x="100" y="18" width="40" height="28" fill="#e05535"/><rect x="140" y="18" width="40" height="28" fill="#f6c49a"/><rect x="20" y="62" width="160" height="28" fill="url(#gl)"/><text x="100" y="58" text-anchor="middle" font-size="11" fill="currentColor">po glazach ↓</text>`],
+ ["Rozcieńczanie","Farba jak mleko: ok. 1:1 z wodą. Dwie cienkie warstwy kryją lepiej niż jedna gruba i nie zalewają detali.",`<path d="M22 80 L58 80 L48 48 L40 36 L30 50Z" fill="#b8202a"/><ellipse cx="100" cy="74" rx="26" ry="9" fill="#b8202a"/><ellipse cx="160" cy="77" rx="32" ry="5" fill="#e9a3a6"/><text x="40" y="98" text-anchor="middle" font-size="11" fill="currentColor">za gęsta</text><text x="100" y="98" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">jak mleko ✓</text><text x="160" y="98" text-anchor="middle" font-size="11" fill="currentColor">za rzadka</text>`]
+];
+$("tech").innerHTML=TE.map(([h,p,s])=>`<div class="card"><h3>${h}</h3><svg viewBox="0 0 200 100" aria-hidden="true">${s}</svg><p>${p}</p></div>`).join("");
+
+// FDM
+const bumps=y=>{let d=`M10 ${y}`;for(let x=10;x<190;x+=20)d+=` Q${x+10} ${y-16} ${x+20} ${y}`;return d};
+const F=[["1 Wydruk","Usuń podpory, wyrównaj ślady nożykiem i pilnikiem.",`<path d="${bumps(50)} V80 H10Z" fill="#b9bdc0"/>`],
+ ["2 Filler","Presto lub Motip, 2–3 cienkie warstwy z 25–30 cm. Wypełnia linie.",`<rect x="10" y="30" width="180" height="22" fill="#7d8287"/><path d="${bumps(50)} V80 H10Z" fill="#b9bdc0"/>`],
+ ["3 Szlif","Papier wodny 400, potem 800. Twarzy i detali nie szlifuj.",`<rect x="10" y="36" width="180" height="16" fill="#7d8287"/><path d="${bumps(50)} V80 H10Z" fill="#b9bdc0"/>`],
+ ["4 Podkład","Czarny Vallejo, a potem biały z góry, jeśli robisz zenithal.",`<rect x="10" y="31" width="180" height="5" fill="#222"/><rect x="10" y="36" width="180" height="16" fill="#7d8287"/><path d="${bumps(50)} V80 H10Z" fill="#b9bdc0"/>`]];
+$("fdm").innerHTML=F.map(([h,p,s])=>`<div class="card"><h3>${h}</h3><svg viewBox="0 0 200 86" aria-hidden="true">${s}</svg><p>${p}</p></div>`).join("");
+
+$("dr").innerHTML=["#b8202a","#e8701e","#2f6b3b","#1e9a90","#cdbf98"].map((c,i)=>`<ellipse cx="${46+i*50}" cy="38" rx="17" ry="6" fill="${c}"/>`).join("");
+
+const E=[["Cienie",["#1c1a1a","#4a2a2c","#c9504a","#d98880"],"czernią",["#4a1014","#b8222b","#e05535","#f6c49a"],"brązem","Czerń brudzi i szarzy kolor."],
+ ["Światła",["#7e161e","#b8222b","#e39aa0","#fbe9ec"],"bielą",["#7e161e","#b8222b","#e05535","#f6c49a"],"pomarańczem","Biel z czerwonym daje róż."],
+ ["Kontrast",["#9a2a30","#a6262e","#b8222b","#c0302f"],"za mały",["#3a0c10","#b8222b","#e05535","#f6c49a"],"duży","Bez kontrastu z daleka widać jedną plamę."]];
+$("errs").innerHTML=E.map(([h,b,bn,g,gn,p],k)=>`<div class="card"><h3>${h}</h3><div class="vs"><div><svg viewBox="0 0 200 210">${sphere(b,85,100,100,"e"+k+"b")}</svg><span class="mark" style="background:var(--bad)">✗</span>${bn}</div><div><svg viewBox="0 0 200 210">${sphere(g,85,100,100,"e"+k+"g")}</svg><span class="mark" style="background:var(--ok)">✓</span>${gn}</div></div><p>${p}</p></div>`).join("");
+
+// zakupy
+const BUY=[["Biały podkład w sprayu do zenithalu","np. Tamiya Fine Surface Primer biały albo Dupli-Color Filler biały"],["Klej cyjanoakrylowy w żelu","do sklejania PLA (Contacta nie klei)"],["Papier wodny 400 / 800 / 1000","szlif po Liquid Surface Primer"],["Bambu Lab hotend 0,2 mm FAH018","drobne detale na A1 mini"]];
+const HAVE=[["Zamówione 14.11: farby","Black 72051, Magic Blue 72021, Off White 72101, Wolf Grey 72047, Basic Skintone 70815"],["Zamówione 14.11: reszta","Tamiya Surface Primer szary (spray), Tamiya Liquid Surface Primer, Vallejo Glaze Medium, pędzel Precision 3"],["Vallejo Fantasy Paint Set 72203","12 farb Squidmar"],["Game Color: Aquamarine 72119, Gorgon Brown 72124, Earth 72062 ×2","Chainmail 72053, Stonewall Grey 72049, Bone White 72034"],["Washe: Black 73201, Umber 73203",""],["Vallejo Hobby Paint Black 28012 (spray)","+ Mecha Color Primer Black"],["AK Ultra Matt Varnish","lakier pędzlem"],["Vallejo Crackle Medium, AK Dark and Dry Crackle","spękana farba / spękana ziemia"],["Pędzle Vallejo Precision + Ammo Drybrush 4","+ Brush Cleaner"],["U-Star pilniki i kostki ścierne",""],["Mokra paleta (wydruk) + ściereczka celulozowa","papier do pieczenia na wierzch"],["Lampa LED 4000 K, CRI 95",""]];
+let done=store.get("done2",{});
+function list(id,arr,pre){$(id).innerHTML=arr.map(([t,s],i)=>{const k=pre+i,on=!!done[k];return `<label class="item${on?" done":""}"><input type="checkbox" data-k="${k}" ${on?"checked":""}><span><span class="t">${t}</span>${s?`<small>${s}</small>`:""}</span></label>`}).join("")}
+function lists(){list("buy",BUY,"b");list("have",HAVE,"h")}
+document.addEventListener("change",e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;done[k]=e.target.checked;store.set("done2",done);lists()});
+if(!Object.keys(done).length){HAVE.forEach((_,i)=>done["h"+i]=true)}
+lists();
+
+
+// ===== postęp kroków (figurki) =====
+function progRender(f){
+ const done=prog[F2[fcur].n]||[];
+ const n=done.filter(Boolean).length,t=f.k.length;
+ $("fprog").innerHTML=`<div class="pbar"><i style="width:${Math.round(n/t*100)}%"></i></div><span>${n} z ${t}</span>${n?'<button id="freset" class="link">Od nowa</button>':""}`;
+ $("fsteps").innerHTML=f.k.map((x,j)=>`<li class="${done[j]?"ok":""}" data-j="${j}" role="checkbox" aria-checked="${!!done[j]}" tabindex="0"><span>${x}</span></li>`).join("");
+}
+$("fsteps").addEventListener("click",e=>{const li=e.target.closest("li");if(!li)return;const j=+li.dataset.j;const d=prog[F2[fcur].n]||[];d[j]=!d[j];prog[F2[fcur].n]=d;store.set("prog",prog);progRender(F2[fcur])});
+$("fprog").addEventListener("click",e=>{if(e.target.id!=="freset")return;prog[F2[fcur].n]=[];store.set("prog",prog);progRender(F2[fcur])});
+progRender(F2[fcur]);
+
+// ===== segmenty =====
+function seg(groupSel,show){document.querySelector(groupSel).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;document.querySelectorAll(groupSel+" button").forEach(x=>x.setAttribute("aria-pressed",x===b));show(b.dataset.t)})}
+seg("#narzedzia .seg",t=>{["farby","zam","timer","calc","foto","plan","kopia","warsztat"].forEach(x=>$("t-"+x).hidden=x!==t);store.set("tool",t)});
+{const t=store.get("tool","farby");const b=document.querySelector(`#narzedzia .seg button[data-t="${t}"]`);if(b)b.click()}
+seg("#figurki .seg",t=>{$("fg-guide").hidden=t!=="guide";$("fg-gal").hidden=t!=="gal";$("fg-queue").hidden=t!=="queue";if(t==="queue")qRender()});
+
+// ===== moje farby =====
+function ownRender(){
+ const names=Object.keys(P);
+ const groups=[["Farby",names.filter(n=>!n.startsWith("wash"))],["Washe",names.filter(n=>n.startsWith("wash"))]];
+ $("ownList").innerHTML=groups.map(([g,arr])=>`<h3 class="secth">${g}</h3><div class="owngrid">${arr.map(n=>`<label class="own${own[n]===false?" off":""}"><input type="checkbox" data-p="${n}" ${own[n]===false?"":"checked"}><i style="background:${P[n]}"></i><span>${n}</span></label>`).join("")}</div>`).join("");
+}
+$("ownList").addEventListener("change",e=>{const n=e.target.dataset.p;if(!n)return;own[n]=e.target.checked;store.set("own",own);ownRender();show();mixOpts()});
+ownRender();
+
+// ===== zamienniki Citadel -> Vallejo =====
+const Z=[
+ ["Abaddon Black","Black"],["White Scar","Dead White (albo Off White)"],["Corax White","Off White"],
+ ["Khorne Red","Gory Red"],["Mephiston Red","Bloody Red (blisko: Scarlet Blood)"],["Evil Sunz Scarlet","Bloody Red (blisko: Scarlet Blood)"],["Wild Rider Red","Hot Orange + Scarlet Blood"],
+ ["Troll Slayer Orange","Hot Orange"],["Jokaero Orange","Orange Fire (blisko: Hot Orange)"],
+ ["Averland Sunset","Gold Yellow"],["Yriel Yellow","Moon Yellow"],["Flash Gitz Yellow","Sun Yellow (blisko: Moon Yellow)"],
+ ["Macragge Blue","Ultramarine Blue"],["Kantor Blue","Imperial Blue"],["Calgar Blue","Magic Blue"],["Altdorf Guard Blue","Magic Blue"],["Teclis Blue","Electric Blue"],["Fenrisian Grey","Wolf Grey"],
+ ["Caliban Green","Dark Green"],["Warpstone Glow","Sick Green (blisko: Cayman Green)"],["Moot Green","Goblin Green (blisko: Scorpy Green)"],["Ork Flesh","Scorpy Green"],["Sotek Green","Turquoise (blisko: Aquamarine)"],
+ ["Rhinox Hide","Charred Brown (blisko: Gorgon Brown + Black)"],["Mournfang Brown","Beasty Brown (blisko: Gorgon Brown)"],["Dryad Bark","Charred Brown (blisko: Gorgon Brown)"],["XV-88","Leather Brown (blisko: Earth)"],["Zandri Dust","Khaki (blisko: Earth + Bone White)"],["Ushabti Bone","Bone White"],["Screaming Skull","Ivory"],
+ ["Bugman's Glow","Dwarf Skin"],["Cadian Fleshtone","Basic Skintone (Model Color)"],["Kislev Flesh","Elfic Flesh"],
+ ["Leadbelcher","Gunmetal Metal (blisko: Chainmail + wash Black)"],["Ironbreaker","Chainmail"],["Runefang Steel","Silver (blisko: Chainmail)"],["Retributor Armour","Polished Gold (blisko: Glorious Gold)"],["Balthasar Gold","Brassy Brass (blisko: Tinny Tin + Glorious Gold)"],["Warplock Bronze","Tinny Tin"],
+ ["Mechanicus Standard Grey","Cold Grey (blisko: Stonewall Grey + Black)"],["Dawnstone","Stonewall Grey"],["Administratum Grey","Stonewall Grey + Off White"],
+ ["Naggaroth Night","Royal Purple"],
+ ["Nuln Oil","Wash Black"],["Agrax Earthshade","Wash Umber"],["Reikland Fleshshade","Wash Fleshtone (blisko: Umber + kropla Gory Red)"],["Seraphim Sepia","Wash Sepia"],["Druchii Violet","Wash Violet"],["Coelia Greenshade","Wash Green"]
+];
+function ownMark(v){const n=v.replace(/ *\(.*$/,"").trim();const key=n.startsWith("Wash ")?"wash "+n.slice(5):n;return P[key]&&own[key]!==false?' <em class="yes">✓ masz</em>':""}
+function zRender(){const q=$("zq").value.trim().toLowerCase();const r=Z.filter(([c,v])=>!q||c.toLowerCase().includes(q)||v.toLowerCase().includes(q));
+ $("zres").innerHTML=r.length?r.map(([c,v])=>`<div class="item"><span><span class="t">${c}</span><small>→ ${v}${ownMark(v)}</small></span></div>`).join(""):'<p class="note">Nie znam tej farby. Spróbuj krótszej nazwy.</p>'}
+$("zq").addEventListener("input",zRender);zRender();
+
+// ===== minutnik =====
+const TP=[["Cienka warstwa farby",5],["Glaze",2],["Wash",20],["Drybrush przed następną warstwą",5],["Podkład w sprayu",60],["Tamiya Surface Primer przed szlifem",60],["Liquid Surface Primer przed szlifem",120],["Lakier AK pędzlem",30],["AK Dark and Dry Crackle",180]];
+$("tpre").innerHTML=TP.map(([n,m],i)=>`<button data-i="${i}"><b>${m>=60?(m/60)+" h":m+" min"}</b>${n}</button>`).join("");
+let timers=store.get("timers",[]);let actx=null;
+function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();[0,0.35,0.7].forEach(t=>{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.25,actx.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+t+.3);o.start(actx.currentTime+t);o.stop(actx.currentTime+t+.3)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}}
+function addT(n,m){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}const nid=Math.floor(Math.random()*1e9);timers.push({n,m,end:Date.now()+m*60000,rang:false,id:nid});try{window.Android&&Android.schedule(nid,m*60,"Paleta figurek",n+": czas minął, możesz malować dalej")}catch(e){}store.set("timers",timers);tRender()}
+$("tpre").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const [n,m]=TP[+b.dataset.i];addT(n,m)});
+$("tadd").addEventListener("click",()=>{const m=Math.max(1,Math.min(600,+$("tmin").value||10));addT("Własny",m)});
+$("tlist").addEventListener("click",e=>{const b=e.target.closest("button[data-x]");if(!b)return;try{const t=timers[+b.dataset.x];window.Android&&t.id&&Android.cancel(t.id)}catch(e){}timers.splice(+b.dataset.x,1);store.set("timers",timers);tRender()});
+function fmt(ms){const s=Math.max(0,Math.ceil(ms/1000));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+":"+String(m).padStart(2,"0"):m)+":"+String(x).padStart(2,"0")}
+function tRender(){const now=Date.now();let ch=false;
+ $("tlist").innerHTML=timers.length?timers.map((t,i)=>{const left=t.end-now,done=left<=0;if(done&&!t.rang){t.rang=true;ch=true;beep()}const pct=Math.min(100,Math.max(0,100-left/(t.m*600)));return `<div class="item timer${done?" fin":""}"><span style="flex:1"><span class="t">${t.n}</span><small>${done?"Gotowe — można dalej malować":"zostało "+fmt(left)}</small><div class="pbar"><i style="width:${pct}%"></i></div></span><button class="x" data-x="${i}" aria-label="Usuń">×</button></div>`}).join(""):'<p class="note">Brak włączonych minutników.</p>';
+ if(ch)store.set("timers",timers)}
+tRender();setInterval(()=>{if(timers.length)tRender()},1000);
+
+// ===== kalkulator =====
+let cd=2,ma=2,mb=1;
+function calc(){const r=+$("crat").value;const med=cd*r;const isW=r===1;
+ $("cdrops").textContent=cd;
+ $("cvis").innerHTML=Array.from({length:cd},()=>'<i style="background:#b8202a"></i>').join("")+"<em>+</em>"+Array.from({length:Math.min(med,24)},()=>`<i style="background:${isW?"#9cc6e0":"#e8eef0"}"></i>`).join("")+(med>24?`<em>…</em>`:"");
+ $("cout").textContent=`${cd} ${cd===1?"kropla":cd<5?"krople":"kropli"} farby + ${med} ${isW?"wody":"medium"}`}
+document.querySelector("#t-calc .card").addEventListener("click",e=>{const b=e.target.closest("button[data-d]");if(!b||b.dataset.m)return;cd=Math.max(1,Math.min(10,cd+ +b.dataset.d));calc()});
+$("crat").addEventListener("change",calc);calc();
+function mixOpts(){const o=Object.keys(P).filter(n=>own[n]!==false).map(n=>`<option>${n}</option>`).join("");const a=$("ma").value,b=$("mb").value;$("ma").innerHTML=o;$("mb").innerHTML=o;$("ma").value=a&&P[a]?a:"Gory Red";$("mb").value=b&&P[b]?b:"Hot Orange";if(!$("ma").value)$("ma").selectedIndex=0;if(!$("mb").value)$("mb").selectedIndex=1;mix()}
+function lin(c){c/=255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4}
+function srgb(c){c=c<=.0031308?c*12.92:1.055*c**(1/2.4)-.055;return Math.round(Math.max(0,Math.min(1,c))*255)}
+function mix(){const A=P[$("ma").value],B=P[$("mb").value];if(!A||!B)return;$("mav").textContent=ma;$("mbv").textContent=mb;
+ const ha=[1,3,5].map(i=>lin(parseInt(A.substr(i,2),16))),hb=[1,3,5].map(i=>lin(parseInt(B.substr(i,2),16)));const w=ma/(ma+mb);
+ const r=ha.map((v,i)=>srgb((v*w+hb[i]*(1-w))*.92));
+ $("msa").style.background=A;$("msb").style.background=B;$("msr").style.background=`rgb(${r.join(",")})`}
+document.querySelector("#t-calc .two").addEventListener("click",e=>{const b=e.target.closest("button[data-m]");if(!b)return;if(b.dataset.m==="a")ma=Math.max(1,Math.min(10,ma+ +b.dataset.d));else mb=Math.max(1,Math.min(10,mb+ +b.dataset.d));mix()});
+$("ma").addEventListener("change",mix);$("mb").addEventListener("change",mix);mixOpts();
+
+// ===== podstawki =====
+const B2=[
+ {n:"Pustynia",c:["#6b5134","#9c7445","#cdbf98"],k:["Na płaską podstawkę nałóż AK Dark and Dry Crackle. Cienko = drobne pęknięcia, grubo = duże płyty.","Zostaw do całkowitego wyschnięcia, aż popęka (kilka godzin).","Wash Umber w pęknięcia.","Drybrush Earth, potem bardzo lekko Bone White.","Brzeg podstawki Black."],buy:""},
+ {n:"Ziemia leśna",c:["#3b2416","#5e3a22","#9c7445"],k:["Klej PVA na podstawkę i drobny piasek lub żwirek.","Po wyschnięciu Gorgon Brown na całość.","Wash Umber.","Drybrush Earth, potem Bone White tylko na kamyki.","Kępki trawy lub liście na klej."],buy:"Drobny piasek, klej PVA (wikol), kępki trawy"},
+ {n:"Bruk i kamień",c:["#3a3c3f","#7c7f82","#cdbf98"],k:["Wydrukuj podstawkę z brukiem albo przyklej kawałki korka.","Stonewall Grey na całość.","Wash Black w szczeliny.","Drybrush Stonewall Grey + Bone White, potem sam Bone White.","Mech: glaze Cayman Green 1:6 w szczeliny."],buy:""},
+ {n:"Lawa",c:["#141414","#e8701e","#f2c230"],k:["Skały Black, szczeliny zostaw płaskie.","Szczeliny: Gory Red, potem Hot Orange coraz bliżej środka.","Środek szczeliny Moon Yellow, w najgorętszym miejscu kropka Ivory.","Glaze Hot Orange 1:6 na krawędzie skał przy lawie (poświata).","Lekki drybrush Stonewall Grey na górne krawędzie skał."],buy:""},
+ {n:"Śnieg",c:["#5e3a22","#c8d1da","#fbfaf5"],k:["Najpierw zrób ziemię jak w „Ziemia leśna”.","Pasta: soda oczyszczona + klej PVA + kropla Off White, albo gotowa pasta śnieżna.","Nakładaj wykałaczką płatami, nie na całą podstawkę.","Po wyschnięciu drybrush Off White.","Śnieg także na butach figurki, wtedy całość pasuje."],buy:"Soda oczyszczona i PVA albo gotowa pasta śnieżna"},
+ {n:"Bagno",c:["#1f3b26","#3b2a20","#5e9b3a"],k:["Ciemne miejsce: Dark Green + Gorgon Brown 1:1.","Brzegi wash Umber.","Glaze Cayman Green na środek kałuży.","Na koniec lakier błyszczący na samą wodę.","Kępki trawy na brzegach."],buy:"Lakier błyszczący, kępki trawy"},
+ {n:"Trawa",c:["#5e3a22","#5e9b3a","#a8c94a"],k:["Baza jak „Ziemia leśna”.","Klej PVA plamami.","Posyp trawą elektrostatyczną i delikatnie dmuchnij.","Po wyschnięciu strzep nadmiar.","Drybrush Yellow Green na czubki trawy (opcjonalnie)."],buy:"Trawa elektrostatyczna 2–4 mm, klej PVA"}];
+let bcur=store.get("base",0);if(!B2[bcur])bcur=0;
+function bRender(){$("bchips").innerHTML=B2.map((b,i)=>`<button class="chip" aria-pressed="${i===bcur}" data-i="${i}"><b style="background:linear-gradient(180deg,${b.c[2]},${b.c[1]} 50%,${b.c[0]})"></b>${b.n}</button>`).join("");
+ const b=B2[bcur];$("bbody").innerHTML=`<div class="basepic" style="background:linear-gradient(180deg,${b.c[2]} 0 22%,${b.c[1]} 22% 70%,${b.c[0]} 70%)"></div><ol class="flow">${b.k.map(x=>`<li><span>${x}</span></li>`).join("")}</ol>${b.buy?`<div class="tip"><b>Do kupienia:</b> ${b.buy}</div>`:""}`}
+$("bchips").addEventListener("click",e=>{const x=e.target.closest(".chip");if(!x)return;bcur=+x.dataset.i;store.set("base",bcur);bRender()});
+bRender();
+
+// ===== słowniczek =====
+const IC={
+ wash:'<path d="M2 30 Q8 14 14 30 Q20 14 26 30 Q32 14 38 30 Q44 14 46 30 V44 H2Z" fill="#9ea2a6"/><path d="M10 27 Q14 33 18 27Z M22 27 Q26 33 30 27Z M34 27 Q38 33 42 27Z" fill="#262626"/>',
+ pin:'<rect x="4" y="14" width="18" height="24" rx="2" fill="#2456a8"/><rect x="26" y="14" width="18" height="24" rx="2" fill="#2456a8"/><rect x="22" y="14" width="4" height="24" fill="#111"/>',
+ dry:'<path d="M2 30 Q8 14 14 30 Q20 14 26 30 Q32 14 38 30 Q44 14 46 30 V44 H2Z" fill="#5e3a22"/><path d="M5 23 Q8 19 11 23 M17 23 Q20 19 23 23 M29 23 Q32 19 35 23 M41 23 Q44 19 46 22" stroke="#e0c592" stroke-width="3" fill="none"/>',
+ layer:'<rect x="4" y="8" width="40" height="32" rx="5" fill="#7e161e"/><rect x="10" y="13" width="28" height="22" rx="4" fill="#b8222b"/><rect x="16" y="18" width="16" height="12" rx="3" fill="#e05535"/><rect x="21" y="22" width="6" height="4" rx="2" fill="#f6c49a"/>',
+ edge:'<path d="M8 18 H34 V42 H8Z" fill="#2f6b3b"/><path d="M8 18 L16 8 H42 L34 18Z" fill="#5e9b3a"/><path d="M34 18 L42 8 V32 L34 42Z" fill="#1f3b26"/><path d="M8 18 H34 L42 8 M34 18 V42" stroke="#d6ec84" stroke-width="2.5" fill="none"/>',
+ glaze:'<defs><linearGradient id="gg"><stop offset="0" stop-color="#7e161e"/><stop offset="1" stop-color="#f6c49a"/></linearGradient></defs><rect x="4" y="16" width="40" height="16" rx="4" fill="url(#gg)"/>',
+ filter:'<rect x="4" y="10" width="40" height="28" rx="4" fill="#7c7f82"/><rect x="4" y="10" width="40" height="28" rx="4" fill="#2456a8" opacity=".35"/>',
+ osl:'<circle cx="24" cy="24" r="20" fill="#1e9a90" opacity=".18"/><circle cx="24" cy="24" r="12" fill="#1e9a90" opacity=".35"/><circle cx="24" cy="24" r="5" fill="#f2e8d2"/>',
+ nmm:'<rect x="6" y="20" width="36" height="8" fill="#141414"/><rect x="6" y="20" width="36" height="3" fill="#7c7f82"/><rect x="6" y="20" width="36" height="1.2" fill="#fff"/><rect x="6" y="28" width="36" height="5" fill="#3a3c3f"/>',
+ zen:'<defs><linearGradient id="gz" x1="0" y1="1" x2="0" y2="0"><stop offset=".2" stop-color="#141414"/><stop offset="1" stop-color="#eee"/></linearGradient></defs><path d="M16 44 H32 L34 22 L28 16 V10 H20 V16 L14 22Z" fill="url(#gz)"/>',
+ base:'<circle cx="24" cy="24" r="18" fill="#b8202a"/><circle cx="24" cy="24" r="18" fill="none" stroke="#7e161e" stroke-width="3"/>',
+ wet:'<rect x="4" y="16" width="40" height="20" rx="4" fill="#9cc6e0"/><rect x="4" y="14" width="40" height="4" fill="#f4ebdd"/><ellipse cx="14" cy="12" rx="5" ry="2" fill="#b8202a"/><ellipse cx="30" cy="12" rx="5" ry="2" fill="#2f6b3b"/>',
+ stip:'<g fill="#e05535"><circle cx="10" cy="12" r="2"/><circle cx="20" cy="18" r="2"/><circle cx="32" cy="10" r="2"/><circle cx="14" cy="30" r="2"/><circle cx="28" cy="28" r="2"/><circle cx="38" cy="22" r="2"/><circle cx="22" cy="38" r="2"/><circle cx="36" cy="36" r="2"/></g>',
+ blend:'<rect x="4" y="16" width="20" height="16" fill="#2456a8"/><rect x="24" y="16" width="20" height="16" fill="#f2c230"/><rect x="18" y="16" width="12" height="16" fill="#5e9b3a" opacity=".85"/>',
+ var:'<rect x="6" y="10" width="36" height="28" rx="4" fill="#b8202a"/><rect x="6" y="10" width="18" height="28" rx="4" fill="#fff" opacity=".35"/>',
+ prime:'<rect x="6" y="26" width="36" height="14" fill="#b9bdc0"/><rect x="6" y="20" width="36" height="6" fill="#7d8287"/><rect x="6" y="17" width="36" height="3" fill="#222"/>',
+ contrast:'<circle cx="16" cy="24" r="12" fill="#a6262e"/><circle cx="34" cy="24" r="12" fill="#3a0c10"/><circle cx="34" cy="20" r="6" fill="#f6c49a"/>'};
+const G=[
+ ["Baza (basecoat)","base","Pierwsza, równa warstwa koloru na danej części, zwykle 2 cienkie warstwy."],
+ ["Podkład (primer)","prime","Warstwa pod farbę, dzięki której farba trzyma się plastiku. Filler dodatkowo wypełnia linie warstw."],
+ ["Zenithal","zen","Czarny podkład, a potem biały spray tylko z góry. Pokazuje, gdzie będą światła i cienie."],
+ ["Wash","wash","Rzadki tusz, który spływa do zagłębień i robi cienie na całej powierzchni."],
+ ["Pin wash","pin","Wash nakładany cienkim pędzlem tylko w szczeliny, np. między płytami pancerza."],
+ ["Drybrush","dry","Prawie suchy pędzel wycierany o wypukłości. Szybkie światła na fakturach."],
+ ["Layering","layer","Kolejne coraz jaśniejsze warstwy na coraz mniejszym polu."],
+ ["Edge highlight","edge","Najjaśniejsza linia tylko na ostrych krawędziach."],
+ ["Glaze","glaze","Prawie przezroczysta farba z medium. Wygładza przejścia i zmienia odcień."],
+ ["Filtr","filter","Bardzo rzadki glaze na całą część, który ujednolica albo ociepla/ochładza kolor."],
+ ["Wet blending","blend","Łączenie dwóch mokrych kolorów bezpośrednio na figurce, żeby uzyskać płynne przejście."],
+ ["Stippling","stip","Stemplowanie końcówką pędzla. Daje fakturę skóry, rdzy albo zarostu."],
+ ["OSL","osl","Object Source Lighting: malowana poświata od świecącego przedmiotu na otoczenie."],
+ ["NMM","nmm","Non-Metallic Metal: metal namalowany zwykłymi farbami, przez mocny kontrast i ostre odblaski."],
+ ["Kontrast","contrast","Różnica jasności między cieniem a światłem. Duży kontrast widać z daleka."],
+ ["Mokra paleta","wet","Paleta na mokrej ściereczce pod papierem. Farba nie zasycha godzinami."],
+ ["Lakier","var","Ostatnia warstwa ochronna. Matowy zabija połysk, błyszczący imituje wodę i oczy."]];
+$("gloss").innerHTML=G.map(([t,i,d])=>`<div class="gl"><svg viewBox="0 0 48 48" aria-hidden="true">${IC[i]}</svg><div><b>${t}</b><span>${d}</span></div></div>`).join("");
+
+// ===== galeria =====
+let gal=store.get("gal",[]);let gpend={a:null,b:null};
+function shrink(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,720/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.72))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
+["a","b"].forEach(k=>$("g"+k).addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{gpend[k]=await shrink(f);$("gp"+k).style.backgroundImage=`url(${gpend[k]})`;$("gp"+k).classList.add("has")}catch(err){$("gmsg").textContent="Nie udało się wczytać zdjęcia."}}));
+$("gsave").addEventListener("click",()=>{if(!gpend.a&&!gpend.b){$("gmsg").textContent="Dodaj przynajmniej jedno zdjęcie.";return}
+ const it={n:$("gname").value.trim()||"Figurka",d:new Date().toLocaleDateString("pl-PL"),a:gpend.a,b:gpend.b};
+ const next=[it,...gal];try{localStorage.setItem("gal",JSON.stringify(next));gal=next;gpend={a:null,b:null};$("gname").value="";["a","b"].forEach(k=>{$("gp"+k).style.backgroundImage="";$("gp"+k).classList.remove("has");$("g"+k).value=""});$("gmsg").textContent="Zapisano.";gRender()}catch(e){$("gmsg").textContent="Brak miejsca w pamięci. Usuń starsze wpisy."}});
+let gdel=-1;
+function gRender(){$("glist").innerHTML=gal.length?gal.map((g,i)=>`<div class="card gitem"><div class="gh"><b>${g.n.replace(/</g,"&lt;")}</b><span>${g.d}</span></div><div class="ba">${g.a?`<figure><img src="${g.a}" alt="Przed"><figcaption>Przed</figcaption></figure>`:""}${g.b?`<figure><img src="${g.b}" alt="Po"><figcaption>Po</figcaption></figure>`:""}</div><button class="link del" data-g="${i}">${gdel===i?"Na pewno usunąć? Dotknij jeszcze raz":"Usuń"}</button></div>`).join(""):'<p class="note">Jeszcze nic tu nie ma. Dodaj pierwszą figurkę powyżej.</p>'}
+$("glist").addEventListener("click",e=>{const b=e.target.closest("button[data-g]");if(!b)return;const i=+b.dataset.g;if(gdel===i){gal.splice(i,1);store.set("gal",gal);gdel=-1}else gdel=i;gRender()});
+gRender();
+
+
+// ===== wspólne kolory =====
+const CODE={"Gory Red":"Game Color 72.011","Scarlet Blood":"Game Color 72.106","Hot Orange":"Game Color 72.009","Moon Yellow":"Game Color 72.005","Ivory":"Model Color 70.918","Yellow Green":"Model Color 70.954","Lime Green":"Model Color 70.827","Scorpy Green":"Game Color 72.032","Cayman Green":"Game Color 72.067","Dark Green":"Game Color 72.028","Glorious Gold":"Game Color 72.056","Tinny Tin":"Game Color 72.060","Aquamarine":"Game Color 72.119","Gorgon Brown":"Game Color 72.124","Earth":"Game Color 72.062","Chainmail":"Game Color 72.053","Stonewall Grey":"Game Color 72.049","Bone White":"Game Color 72.034","Black":"Game Color 72.051","Magic Blue":"Game Color 72.021","Off White":"Game Color 72.101","Wolf Grey":"Game Color 72.047","Basic Skintone":"Model Color 70.815","wash Umber":"Game Color Wash 73.203","wash Black":"Game Color Wash 73.201"};
+const METAL=["Chainmail","Glorious Gold","Tinny Tin"];
+const hx=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
+const toHex=a=>"#"+a.map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,"0")).join("");
+function lab(rgb){const [r,g,b]=rgb.map(lin);let x=(r*.4124+g*.3576+b*.1805)/.95047,y=r*.2126+g*.7152+b*.0722,z=(r*.0193+g*.1192+b*.9505)/1.08883;const f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116;x=f(x);y=f(y);z=f(z);return [116*y-16,500*(x-y),200*(y-z)]}
+const dE=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
+function mixRGB(A,B,wa,wb){const a=hx(A).map(lin),b=hx(B).map(lin),w=wa/(wa+wb);return a.map((v,i)=>srgb((v*w+b[i]*(1-w))*.92))}
+const shade=(h,k)=>toHex(hx(h).map(v=>v*(1-k)));
+const tint=(h,k)=>toHex(hx(h).map(v=>v+(255-v)*k));
+const owned=()=>Object.keys(P).filter(n=>own[n]!==false);
+
+// ===== kolory ze zdjęcia =====
+let fimg=null,fbig=null;
+$("fpick").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{fimg=im;analyze(im)};im.src=r.result};r.readAsDataURL(f)});
+$("fbg").addEventListener("change",()=>{if(fimg)analyze(fimg)});
+function matchColor(rgb){const pal=owned().filter(n=>!n.startsWith("wash")&&!METAL.includes(n)).map(n=>({n,c:P[n],l:lab(hx(P[n]))}));const L=lab(rgb);let best={d:1e9};pal.forEach(p=>{const t=dE(L,p.l);if(t<best.d)best={d:t,txt:p.n,c:p.c}});let mx={d:1e9};pal.forEach(a=>pal.forEach(b=>{if(a.n>=b.n)return;[[1,1],[2,1],[1,2],[3,1],[1,3]].forEach(([wa,wb])=>{const m=mixRGB(a.c,b.c,wa,wb);const t=dE(L,lab(m));if(t<mx.d)mx={d:t,txt:`${wa}× ${a.n} + ${wb}× ${b.n}`,c:toHex(m)}})}));return {use:mx.d<best.d*.7?mx:best,single:best.txt}}
+function q(d){return d<8?"bardzo blisko":d<16?"blisko":"daleko — rozjaśnij lub przyciemnij"}
+function analyze(im){
+ const k=Math.min(1,96/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));
+ const x=c.getContext("2d");x.drawImage(im,0,0,c.width,c.height);const d=x.getImageData(0,0,c.width,c.height).data;const px=[];
+ const skip=$("fbg").checked,W=c.width,H=c.height;for(let i=0;i<d.length;i+=4){const pi=i/4,xx=pi%W,yy=Math.floor(pi/W);if(skip&&(xx<W*.18||xx>W*.82||yy<H*.12||yy>H*.92))continue;if(d[i+3]>200)px.push([d[i],d[i+1],d[i+2]])}
+ {const k2=Math.min(1,900/Math.max(im.width,im.height));fbig=document.createElement("canvas");fbig.width=Math.round(im.width*k2);fbig.height=Math.round(im.height*k2);fbig.getContext("2d").drawImage(im,0,0,fbig.width,fbig.height);
+ $("fprev").innerHTML=`<img src="${fbig.toDataURL("image/jpeg",.85)}" alt="Wybrane zdjęcie" class="fimg" id="fimgel"><p class="note">Dotknij miejsca na zdjęciu, żeby sprawdzić jego kolor.</p>`;
+ $("fimgel").addEventListener("click",ev=>{const r=ev.target.getBoundingClientRect();const x=Math.round((ev.clientX-r.left)/r.width*fbig.width),y=Math.round((ev.clientY-r.top)/r.height*fbig.height);const d2=fbig.getContext("2d").getImageData(Math.max(0,x-3),Math.max(0,y-3),7,7).data;let a=[0,0,0],n=0;for(let i=0;i<d2.length;i+=4){a[0]+=d2[i];a[1]+=d2[i+1];a[2]+=d2[i+2];n++}a=a.map(v=>v/n);const m=matchColor(a);
+  $("fpick1").innerHTML=`<div class="item picked"><span class="duo"><i style="background:${toHex(a)}"></i><i style="background:${m.use.c}"></i></span><span style="flex:1"><span class="t">${m.use.txt}</span><small>dotknięte miejsce · ${q(m.use.d)}</small></span></div>`})}
+ const K=6;let cs=[px[Math.floor(px.length/2)]];
+ while(cs.length<K){let best=null,bd=-1;for(let i=0;i<px.length;i+=3){const p=px[i];const m=Math.min(...cs.map(q=>(p[0]-q[0])**2+(p[1]-q[1])**2+(p[2]-q[2])**2));if(m>bd){bd=m;best=p}}cs.push(best.slice())}
+ let as=new Array(px.length).fill(0);
+ for(let it=0;it<10;it++){const sum=cs.map(()=>[0,0,0,0]);px.forEach((p,i)=>{let bi=0,bd=1e9;cs.forEach((q,j)=>{const t=(p[0]-q[0])**2+(p[1]-q[1])**2+(p[2]-q[2])**2;if(t<bd){bd=t;bi=j}});as[i]=bi;const s=sum[bi];s[0]+=p[0];s[1]+=p[1];s[2]+=p[2];s[3]++});cs=cs.map((q,j)=>sum[j][3]?sum[j].slice(0,3).map(v=>v/sum[j][3]):q)}
+ const cnt=cs.map((_,j)=>as.filter(a=>a===j).length);
+ const pal=owned().filter(n=>!n.startsWith("wash")&&!METAL.includes(n)).map(n=>({n,c:P[n],l:lab(hx(P[n]))}));
+ const res=cs.map((q,j)=>({q,share:cnt[j]/px.length})).filter(r=>r.share>.03).sort((a,b)=>b.share-a.share).map(r=>{
+  const L=lab(r.q);let best={d:1e9};pal.forEach(p=>{const t=dE(L,p.l);if(t<best.d)best={d:t,txt:p.n,c:p.c}});
+  let mx={d:1e9};pal.forEach(a=>pal.forEach(b=>{if(a.n>=b.n)return;[[1,1],[2,1],[1,2],[3,1],[1,3]].forEach(([wa,wb])=>{const m=mixRGB(a.c,b.c,wa,wb);const t=dE(L,lab(m));if(t<mx.d)mx={d:t,txt:`${wa}× ${a.n} + ${wb}× ${b.n}`,c:toHex(m)}})}));
+  const use=mx.d<best.d*.7?mx:best;return {...r,use,single:best.txt,q:toHex(r.q)}});
+ lastPhoto=res;$("f2plan").hidden=!res.length;
+ $("fres").innerHTML=res.map(r=>`<div class="item"><span class="duo"><i style="background:${r.q}"></i><i style="background:${r.use.c}"></i></span><span style="flex:1"><span class="t">${r.use.txt}</span><small>${Math.round(r.share*100)}% obrazka · ${r.use.d<8?"bardzo blisko":r.use.d<16?"blisko":"daleko — rozjaśnij lub przyciemnij"}</small></span></div>`).join("")+'<p class="note">Lewy kwadrat: kolor ze zdjęcia. Prawy: Twoja farba lub mieszanka. Metale i washe dobierasz ręcznie.</p>';
+}
+
+// ===== plan kolorów =====
+let lastPhoto=[];
+const REG=[["podstawka","Podstawka"],["buty","Buty"],["spodnie","Spodnie"],["plaszcz","Płaszcz"],["koszula","Koszula"],["pas","Pas"],["skora","Skóra"],["kapelusz","Kapelusz"],["bron","Broń"]];
+const SHP={podstawka:'<ellipse cx="100" cy="282" rx="70" ry="13"/>',buty:'<path d="M72 250h24v22H66q0-12 6-22zM104 250h24q6 10 6 22h-30z"/>',spodnie:'<path d="M74 168h52l4 84h-26l-4-56-4 56H70z"/>',plaszcz:'<path d="M62 92l20-8h4l-8 170H54zM138 92l-20-8h-4l8 170h24z"/>',koszula:'<path d="M82 84h36l8 86H74zM58 94l14-6 6 62-12 6zM142 94l-14-6-6 62 12 6z"/>',pas:'<path d="M74 160h52v10H74z"/>',skora:'<circle cx="100" cy="62" r="18"/><circle cx="70" cy="160" r="7"/><circle cx="130" cy="160" r="7"/>',kapelusz:'<path d="M66 50q34-10 68 0l-4 5H70zM82 50q2-24 18-24t18 24z"/>',bron:'<path d="M152 120h6v130h-6zM146 150h18v6h-18z"/>'};
+let plan=store.get("plan",{podstawka:"Earth",buty:"Black",spodnie:"Gorgon Brown",plaszcz:"Magic Blue",koszula:"Wolf Grey",pas:"Gorgon Brown",skora:"Basic Skintone",kapelusz:"Gorgon Brown",bron:"Chainmail"});
+let psel="plaszcz";
+function pRender(){
+ $("psvg").innerHTML=`<defs><linearGradient id="psh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></linearGradient></defs>`+
+ REG.map(([r])=>`<g data-r="${r}" fill="${P[plan[r]]||"#ccc"}" stroke="${r===psel?"var(--acc)":"rgba(0,0,0,.35)"}" stroke-width="${r===psel?3:1}" style="cursor:pointer">${SHP[r]}</g>`).join("")+
+ `<g fill="url(#psh)" pointer-events="none">${REG.map(([r])=>SHP[r]).join("")}</g>`;
+ $("psel").innerHTML=`Wybrana część: <b>${REG.find(x=>x[0]===psel)[1]}</b> — ${plan[psel]||"brak"}`;
+ $("ppal").innerHTML=owned().filter(n=>!n.startsWith("wash")).map(n=>`<button data-p="${n}" aria-pressed="${plan[psel]===n}" title="${n}"><i style="background:${P[n]}"></i><span>${n}</span></button>`).join("");
+ store.set("plan",plan)}
+$("psvg").addEventListener("click",e=>{const g=e.target.closest("g[data-r]");if(!g)return;psel=g.dataset.r;pRender()});
+$("ppal").addEventListener("click",e=>{const b=e.target.closest("button[data-p]");if(!b)return;plan[psel]=b.dataset.p;pRender()});
+function hsl(h){const [r,g,b]=hx(h).map(v=>v/255),mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;let hh=0,s=0;if(d){s=d/(1-Math.abs(2*l-1));hh=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;hh*=60;if(hh<0)hh+=360}return [hh,s,l]}
+function near(target,ex){const c=owned().filter(n=>!n.startsWith("wash")&&!METAL.includes(n)&&!ex.includes(n)).map(n=>[n,...hsl(P[n])]).filter(x=>x[2]>.3&&x[3]>.15&&x[3]<.8);c.sort((a,b)=>{const da=Math.min(Math.abs(a[1]-target),360-Math.abs(a[1]-target)),db=Math.min(Math.abs(b[1]-target),360-Math.abs(b[1]-target));return da-db});return c[0]&&c[0][0]}
+$("t-plan").querySelector(".gen").addEventListener("click",e=>{const b=e.target.closest("button[data-g]");if(!b)return;
+ const ch=owned().filter(n=>!n.startsWith("wash")&&!METAL.includes(n)).filter(n=>{const s=hsl(P[n]);return s[1]>.3&&s[2]>.15&&s[2]<.8});if(!ch.length)return;
+ const main=ch[Math.floor(Math.random()*ch.length)],h=hsl(P[main])[0],m=b.dataset.g;
+ const t2=m==="comp"?h+180:m==="tri"?h+120:h+30,t3=m==="tri"?h+240:m==="ana"?h-30:h+180;
+ const sec=near((t2+360)%360,[main])||main,acc=near((t3+360)%360,[main,sec])||sec;
+ const pick=(...n)=>n.find(x=>own[x]!==false&&P[x]);
+ plan={plaszcz:main,koszula:sec,kapelusz:m==="comp"?pick("Gorgon Brown","Black"):acc,pas:pick("Gorgon Brown","Earth"),spodnie:pick("Stonewall Grey","Gorgon Brown","Black"),buty:pick("Black","Gorgon Brown"),skora:pick("Basic Skintone","Ivory"),bron:pick("Chainmail","Tinny Tin"),podstawka:pick("Earth","Stonewall Grey")};
+ $("pgen").textContent=`Główny: ${main}, drugi: ${sec}${m!=="comp"?", akcent: "+acc:""}. Reszta to neutralne brązy i szarości.`;pRender()});
+let plans=store.get("plans",[]);
+function plRender(){$("plist").innerHTML=plans.length?plans.map((p,i)=>`<div class="item"><span class="strip">${REG.map(([r])=>`<i style="background:${P[p.m[r]]||"#ccc"}"></i>`).join("")}</span><span style="flex:1"><span class="t">${p.n.replace(/</g,"&lt;")}</span></span><button class="link" data-l="${i}">Wczytaj</button><button class="x" data-d="${i}" aria-label="Usuń">×</button></div>`).join(""):'<p class="note">Nie masz jeszcze zapisanych zestawów.</p>'}
+$("psave").addEventListener("click",()=>{plans.unshift({n:$("pname").value.trim()||"Zestaw "+(plans.length+1),m:{...plan}});store.set("plans",plans);$("pname").value="";plRender()});
+$("plist").addEventListener("click",e=>{const l=e.target.closest("[data-l]"),d=e.target.closest("[data-d]");if(l){plan={...plans[+l.dataset.l].m};pRender()}if(d){plans.splice(+d.dataset.d,1);store.set("plans",plans);plRender()}});
+pRender();plRender();
+$("f2plan").onclick=()=>{const order=["plaszcz","koszula","spodnie","kapelusz","buty","pas","podstawka"];const L=lastPhoto.map(r=>r.single).filter(Boolean);
+ const skin=lastPhoto.find(r=>{const [h,s,l]=hsl(r.q);return h>10&&h<45&&s>.25&&l>.45&&l<.85});
+ if(skin)plan.skora=skin.single;let k=0;L.forEach(n=>{if(skin&&n===skin.single)return;if(k<order.length)plan[order[k++]]=n});
+ document.querySelector('#narzedzia .seg button[data-t="plan"]').click();pRender();$("pgen").textContent="Kolory przeniesione ze zdjęcia. Popraw części, które nie pasują.";window.scrollTo(0,0)};
+
+// ===== kopia zapasowa =====
+const KEYS=["own","low","prog","gal","custom","plans","plan","done2","fig","mat","base","timers","nozzle","tool","ip","lampk","lampb"];
+function exp(withImg){const o={app:"paleta-figurek",v:1,d:new Date().toISOString()};KEYS.forEach(k=>{try{const v=localStorage.getItem(k);if(v!==null)o[k]=JSON.parse(v)}catch(e){}});if(!withImg)delete o.gal;$("ktext").value=JSON.stringify(o);$("kmsg").textContent=`Gotowe: ${Math.round($("ktext").value.length/1024)} KB. Skopiuj i wklej w drugim miejscu.`}
+$("kexp").onclick=()=>exp(true);$("kexp2").onclick=()=>exp(false);
+$("kcopy").onclick=async()=>{try{await navigator.clipboard.writeText($("ktext").value);$("kmsg").textContent="Skopiowano do schowka."}catch(e){$("ktext").select();$("kmsg").textContent="Zaznaczyłem tekst — skopiuj go ręcznie."}};
+function imp(txt){try{const o=JSON.parse(txt);if(o.app!=="paleta-figurek")throw 0;KEYS.forEach(k=>{if(k in o)localStorage.setItem(k,JSON.stringify(o[k]))});$("kmsg").textContent="Zaimportowano. Odświeżam…";setTimeout(()=>location.reload(),600)}catch(e){$("kmsg").textContent="To nie wygląda na kopię z Palety figurek."}}
+$("kimp").onclick=()=>imp($("ktext").value.trim());
+$("kfile").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>imp(String(r.result).trim());r.readAsText(f)});
+
+// ===== warsztat ESP32 =====
+let wtimer=null;$("wip").value=store.get("ip","");$("wk").value=store.get("lampk",4000);$("wb").value=store.get("lampb",80);$("wkv").textContent=$("wk").value;$("wbv").textContent=$("wb").value;
+function base(){const v=$("wip").value.trim().replace(/^https?:\/\//,"").replace(/\/$/,"");return v?"http://"+v:""}
+async function get(path){const b=base();if(!b)throw new Error("brak adresu");const c=new AbortController();const t=setTimeout(()=>c.abort(),4000);try{const r=await fetch(b+path,{signal:c.signal,cache:"no-store"});return r}finally{clearTimeout(t)}}
+async function poll(){try{const r=await get("/data");const j=await r.json();$("wt").textContent=(+j.t).toFixed(1)+" °C";$("wh").textContent=Math.round(j.h)+" %";const ok=j.h<65&&j.t>=15;$("wv").textContent=ok?"Można lakierować":"Czekaj: "+(j.h>=65?"za wilgotno":"za zimno");$("wv").className="verdict "+(ok?"ok":"bad")}catch(e){$("wv").textContent="Brak połączenia — sprawdź adres i Wi-Fi";$("wv").className="verdict"}}
+$("wcon").onclick=()=>{store.set("ip",$("wip").value.trim());poll();clearInterval(wtimer);wtimer=setInterval(()=>{if(!$("t-warsztat").hidden&&$("narzedzia").classList.contains("on"))poll()},10000)};
+let ld=null;function lamp(){$("wkv").textContent=$("wk").value;$("wbv").textContent=$("wb").value;store.set("lampk",+$("wk").value);store.set("lampb",+$("wb").value);clearTimeout(ld);ld=setTimeout(()=>{get(`/lamp?k=${$("wk").value}&b=${$("wb").value}`).catch(()=>{})},250)}
+$("wk").addEventListener("input",lamp);$("wb").addEventListener("input",lamp);
+$("t-warsztat").querySelector(".gen").addEventListener("click",e=>{const b=e.target.closest("button[data-k]");if(!b)return;$("wk").value=b.dataset.k;lamp()});
+
+// ===== kończy się + Keep =====
+let low=store.get("low",{});
+function lowRender(){const L=Object.keys(low).filter(k=>low[k]);
+ $("lowl").innerHTML=L.length?L.map(n=>`<label class="item"><input type="checkbox" data-low="${n}"><span><span class="t">${n}</span><small>Vallejo ${CODE[n]||""} · zaznacz po zakupie</small></span></label>`).join(""):'<p class="note">Nic się nie kończy. W „Moje farby” dotknij „mało” przy farbie, która się kończy.</p>'}
+$("lowl").addEventListener("change",e=>{const n=e.target.dataset.low;if(!n)return;delete low[n];store.set("low",low);lowRender();ownRender2()});
+$("keep").onclick=async()=>{const lines=[...Object.keys(low).filter(k=>low[k]).map(n=>`Vallejo ${CODE[n]||""} ${n}`.replace(/\s+/g," ")),...BUY.filter((_,i)=>!done["b"+i]).map(([t])=>t)];const txt=lines.join("\n");try{await navigator.clipboard.writeText(txt);$("keepmsg").textContent=`Skopiowano ${lines.length} pozycji. W Google Keep utwórz listę i wklej.`}catch(e){$("keepmsg").textContent="Nie udało się skopiować automatycznie:";$("keeptxt").hidden=false;$("keeptxt").value=txt}};
+function ownRender2(){document.querySelectorAll("#ownList .own").forEach(l=>{const n=l.querySelector("input").dataset.p;let b=l.querySelector(".lowb");if(!b){b=document.createElement("button");b.className="lowb";b.dataset.lp=n;l.after?null:0;l.appendChild(b)}b.textContent=low[n]?"kończy się":"mało";b.classList.toggle("on",!!low[n])})}
+$("ownList").addEventListener("click",e=>{const b=e.target.closest(".lowb");if(!b)return;e.preventDefault();const n=b.dataset.lp;low[n]=!low[n];if(!low[n])delete low[n];store.set("low",low);ownRender2();lowRender()});
+new MutationObserver(()=>ownRender2()).observe($("ownList"),{childList:true});
+ownRender2();lowRender();
+
+// ===== własne figurki =====
+function cfRow(n="",p="Gorgon Brown",t=""){const o=owned().filter(x=>!x.startsWith("wash")).map(x=>`<option${x===p?" selected":""}>${x}</option>`).join("");return `<div class="cfrow"><input type="text" placeholder="Część, np. Płaszcz" value="${n.replace(/"/g,"&quot;")}"><select>${o}</select><input type="text" placeholder="Opis, np. wash Umber, światła Earth" value="${t.replace(/"/g,"&quot;")}"><button class="x" aria-label="Usuń część">×</button></div>`}
+let cedit=-1;
+function cfOpen(i){cedit=i;const f=i>=0?F2[i]:{n:"",d:"",p:[],k:[],t:""};$("cfn").value=f.n;$("cfd").value=f.d;$("cft").value=f.t;$("cfk").value=f.k.join("\n");$("cfparts").innerHTML=(f.p.length?f.p:[["",[],""]]).map(x=>cfRow(x[0],x[3]||"Gorgon Brown",x[2])).join("");$("cform").hidden=false;$("cfdel").hidden=i<0;$("cform").scrollIntoView({behavior:"smooth"})}
+$("cfadd").onclick=()=>$("cfparts").insertAdjacentHTML("beforeend",cfRow());
+$("cfparts").addEventListener("click",e=>{const b=e.target.closest(".x");if(b)b.parentElement.remove()});
+$("cfcancel").onclick=()=>{$("cform").hidden=true};
+$("cfsave").onclick=()=>{const p=[...$("cfparts").querySelectorAll(".cfrow")].map(r=>{const [a,c]=r.querySelectorAll("input"),s=r.querySelector("select").value,h=P[s]||"#888";return [a.value.trim()||"Część",[shade(h,.35),h,tint(h,.35)],(c.value.trim()||s),s]}).filter(x=>x[0]);
+ const f={n:$("cfn").value.trim()||"Moja figurka",d:$("cfd").value.trim(),p,k:$("cfk").value.split("\n").map(x=>x.trim()).filter(Boolean),t:$("cft").value.trim()||"Własna instrukcja.",own:1};if(!f.k.length)f.k=["Podkład i zenithal.","Bazy wszystkich części.","Wash.","Światła i krawędzie.","Detale i lakier."];
+ if(cedit>=0){F2[cedit]=f;custom[cedit-BASEN]=f}else{F2.push(f);custom.push(f);cedit=F2.length-1}
+ store.set("custom",custom);fcur=cedit;store.set("fig",fcur);$("cform").hidden=true;showFig()};
+$("cfdel").onclick=()=>{if($("cfdel").dataset.sure!=="1"){$("cfdel").dataset.sure="1";$("cfdel").textContent="Na pewno? Dotknij jeszcze raz";return}$("cfdel").dataset.sure="";$("cfdel").textContent="Usuń figurkę";F2.splice(cedit,1);custom.splice(cedit-BASEN,1);store.set("custom",custom);fcur=0;store.set("fig",0);$("cform").hidden=true;showFig()};
+$("fedit").onclick=()=>cfOpen(fcur);
+
+// ===== tryb przy stole =====
+let tj=0,wl=null;
+async function wake(on){try{if(on&&navigator.wakeLock)wl=await navigator.wakeLock.request("screen");else if(wl){await wl.release();wl=null}}catch(e){}}
+function tbRender(){const f=F2[fcur],n=f.k.length;const d=prog[f.n]||[];
+ if(tj>=n){$("tbbody").innerHTML=`<div class="tbdone"><b>Figurka skończona!</b><p>Zrób zdjęcie i dodaj je do galerii.</p><button class="gbtn" id="tbgal">Dodaj do galerii</button></div>`;$("tbstep").textContent=`${n} z ${n}`;$("tbprev").disabled=false;$("tbnext").textContent="Zamknij";return}
+ $("tbstep").textContent=`Krok ${tj+1} z ${n}`;$("tbbody").innerHTML=`<p class="tbtext">${f.k[tj]}</p><div class="tbparts">${f.p.map(([nm,c])=>`<span><i style="background:${c[1]}"></i>${nm}</span>`).join("")}</div>${d[tj]?'<p class="note">✓ Ten krok masz już odhaczony.</p>':""}`;
+ $("tbprev").disabled=tj===0;$("tbnext").textContent=tj===n-1?"Gotowe, koniec ✓":"Gotowe, dalej →"}
+$("tbopen").onclick=()=>{const f=F2[fcur],d=prog[f.n]||[];tj=d.findIndex(x=>!x);if(tj<0)tj=d.length>=f.k.length?0:d.length;$("tb").hidden=false;$("tbname").textContent=f.n;document.body.style.overflow="hidden";wake(true);tbRender()};
+function tbClose(){$("tb").hidden=true;document.body.style.overflow="";wake(false);progRender(F2[fcur])}
+$("tbx").onclick=tbClose;
+$("tbprev").onclick=()=>{tj=Math.max(0,tj-1);tbRender()};
+$("tbnext").onclick=()=>{const f=F2[fcur];if(tj>=f.k.length){tbClose();return}const d=prog[f.n]||[];d[tj]=true;prog[f.n]=d;store.set("prog",prog);tj++;tbRender()};
+$("tbbody").addEventListener("click",e=>{if(e.target.id!=="tbgal")return;tbClose();document.querySelector('#figurki .seg button[data-t="gal"]').click();$("gname").value=F2[fcur].n;$("gname").scrollIntoView({behavior:"smooth"})});
+document.addEventListener("visibilitychange",()=>{if(!$("tb").hidden&&document.visibilityState==="visible")wake(true)});
+
+// ===== kolejka figurek =====
+let queue=store.get("queue",[]);const QS=[["todo","Do pomalowania"],["doing","W trakcie"],["done","Gotowe"]];
+function qOpts(){$("qfig").innerHTML='<option value="">— bez instrukcji —</option>'+F2.map(f=>`<option>${f.n.replace(/</g,"&lt;")}</option>`).join("")}
+function qRender(){qOpts();
+ $("qcols").innerHTML=QS.map(([st,nm],si)=>{const it=queue.map((q,i)=>[q,i]).filter(([q])=>q.s===st);
+  return `<h3 class="secth">${nm} <span class="cnt">${it.length}</span></h3><div class="list">${it.length?it.map(([q,i])=>{const f=F2.find(x=>x.n===q.f);const d=f?(prog[f.n]||[]).filter(Boolean).length:0;const ph=gal.filter(g=>g.n===q.n).length;
+   return `<div class="item qi"><span style="flex:1"><span class="t">${q.n.replace(/</g,"&lt;")}</span><small>${f?`instrukcja: ${f.n} · ${d} z ${f.k.length} kroków`:"bez instrukcji"}${ph?` · ${ph} zdj.`:""}</small>${f&&st!=="todo"?`<div class="pbar"><i style="width:${Math.round(d/f.k.length*100)}%"></i></div>`:""}</span>
+   <span class="qb">${si>0?`<button data-q="${i}" data-m="-1" aria-label="Wstecz">←</button>`:""}${si<2?`<button data-q="${i}" data-m="1" aria-label="Dalej">→</button>`:""}${f?`<button data-o="${i}" aria-label="Otwórz instrukcję">▶</button>`:""}<button data-x="${i}" aria-label="Usuń">×</button></span></div>`}).join(""):'<p class="note">Pusto.</p>'}</div>`}).join("")}
+$("qadd").onclick=()=>{const n=$("qname").value.trim()||$("qfig").value;if(!n)return;queue.push({n,f:$("qfig").value,s:"todo"});store.set("queue",queue);$("qname").value="";qRender()};
+$("qcols").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.m){const q=queue[+b.dataset.q];const i=QS.findIndex(x=>x[0]===q.s)+ +b.dataset.m;q.s=QS[Math.max(0,Math.min(2,i))][0];store.set("queue",queue);qRender()}
+ else if(b.dataset.o){const q=queue[+b.dataset.o];const i=F2.findIndex(x=>x.n===q.f);if(i>=0){fcur=i;store.set("fig",i);if(q.s==="todo"){q.s="doing";store.set("queue",queue)}document.querySelector('#figurki .seg button[data-t="guide"]').click();showFig();window.scrollTo(0,0)}}
+ else if(b.dataset.x){if(b.dataset.sure){queue.splice(+b.dataset.x,1);store.set("queue",queue);qRender()}else{b.dataset.sure="1";b.textContent="?";b.setAttribute("aria-label","Dotknij ponownie, aby usunąć")}}});
+
+// ===== kalkulator skali =====
+function scale(){const r=+$("scl").value,h=(+$("sre").value||0)*10,m=+$("smm").value||0;if(!h||!m){$("sh").textContent="—";$("sp").textContent="—";return}
+ const t=h/r;$("sh").textContent=t.toFixed(1)+" mm";$("sp").textContent=Math.round(t/m*100)+" %";store.set("scale",[$("scl").value,$("sre").value,$("smm").value])}
+{const v=store.get("scale",null);if(v){$("scl").value=v[0];$("sre").value=v[1];$("smm").value=v[2]}}
+["scl","sre","smm"].forEach(id=>$(id).addEventListener("input",scale));scale();
+
+// nawigacja
+const MAP={przepisy:["przepisy"],figurki:["figurki"],narzedzia:["narzedzia"],wiedza:["kolory","techniki","slownik"],druk:["druk"],zakupy:["zakupy"]};
+const ALL=["przepisy","figurki","narzedzia","kolory","techniki","slownik","druk","zakupy"];
+function route(){let h=location.hash.slice(1);if(h==="kolory"||h==="techniki")h="wiedza";const k=MAP[h]?h:"przepisy";ALL.forEach(x=>$(x).classList.toggle("on",MAP[k].includes(x)));document.querySelectorAll("nav a").forEach(a=>a.setAttribute("aria-current",a.dataset.s===k?"page":"false"));window.scrollTo(0,0)}
+addEventListener("hashchange",route);route();
+}
+</script>
+</body>
+</html>

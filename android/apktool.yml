@@ -1,0 +1,23 @@
+version: 2.10.0
+apkFileName: paleta.apk
+isFrameworkApk: false
+usesFramework:
+  ids:
+  - 1
+  tag: null
+sdkInfo:
+  minSdkVersion: 26
+  targetSdkVersion: 34
+packageInfo:
+  forcedPackageId: 127
+  renameManifestPackage: null
+versionInfo:
+  versionCode: 7
+  versionName: '1.4.1'
+doNotCompress:
+- png
+- arsc
+- resources.arsc
+resourcesAreCompressed: false
+sharedLibrary: false
+sparseResources: false
