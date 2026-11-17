@@ -207,7 +207,7 @@ code{font-size:13px;overflow-wrap:anywhere}
 .scres div{background:var(--bg);border-radius:12px;padding:10px 12px}
 .scres span{display:block;font-size:13px;color:var(--quiet)}
 .scres b{font:800 clamp(22px,6vw,30px) Sora,sans-serif;white-space:nowrap}
-.custom #wip,.custom #pname,.custom #iean{width:auto;flex:1 1 auto}
+.custom #wip,.custom #pname,.custom #iean,.custom #buyin,.custom #havein{width:auto;flex:1 1 auto}
 .tbdone{text-align:center}.tbdone b{font:800 32px Sora,sans-serif;display:block}.tbdone p{margin:10px 0 16px;color:var(--quiet)}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--card);border-radius:14px;padding:5px;margin-top:12px}
 .seg button{min-height:44px;border:0;border-radius:10px;background:transparent;color:var(--ink);font:600 15px Inter,sans-serif;cursor:pointer}
@@ -267,7 +267,6 @@ code{font-size:13px;overflow-wrap:anywhere}
  <p class="lead">Ładna podstawka to połowa efektu. Wybierz teren.</p>
  <div class="chips" id="bchips" role="group" aria-label="Podstawka"></div>
  <div id="bbody"></div>
- <p class="note" style="margin-top:16px">Farby zamówione 14.11 (Black, Magic Blue, Off White, Wolf Grey, Basic Skintone) są już w przepisach.</p>
 </section>
 
 <section id="figurki">
@@ -569,8 +568,10 @@ code{font-size:13px;overflow-wrap:anywhere}
  <h3 class="secth">Kończy się i do kupienia</h3>
  <div class="list" id="lowl"></div>
  <h3 class="secth">Do kupienia</h3>
+ <div class="custom"><input id="buyin" type="text" maxlength="80" placeholder="np. Biały podkład w sprayu"><button id="buyadd">Dodaj</button></div>
  <div class="list" id="buy"></div>
  <h3 class="secth">Już masz</h3>
+ <div class="custom"><input id="havein" type="text" maxlength="80" placeholder="np. Pędzel Precision 3"><button id="haveadd">Dodaj</button></div>
  <div class="list" id="have"></div>
 </section>
 </div>
@@ -629,7 +630,7 @@ function trRow(n){if(!TRREADY)return null;const k=LEG[n],r=k&&DBK[k];if(!r)retur
 function trName(n){if(!TRREADY||brand==="V")return n;const r=trRow(n);if(!r)return n;return (brand==="I"&&dk(r)===LEG[n])?n:"≈ "+r[2]}
 function trHex(n){if(!TRREADY||brand==="V")return P[n];const r=trRow(n);return r?r[4]:P[n]}
 function trText(t){if(!TRREADY||brand==="V"||!t)return t;return t.replace(LEGRE,m=>trName(m))}
-function isMiss(n){if(!TRREADY||brand==="V")return own[n]===false;if(brand==="I"||!inv.length)return false;const r=trRow(n);return r?!inv.includes(dk(r)):false}
+function isMiss(n){if(!TRREADY)return own[n]===false;if(brand==="V")return inv.length>0&&own[n]===false;if(brand==="I"||!inv.length)return false;const r=trRow(n);return r?!inv.includes(dk(r)):false}
 let own=store.get("own",{});
 let prog=store.get("prog",{});
 const SUB={"Black":"wash Black w 2–3 warstwach albo Gorgon Brown + Dark Green","Off White":"Ivory","Ivory":"Off White + kropla Bone White","Magic Blue":"Aquamarine + kropla Black (bardziej turkusowy)","Wolf Grey":"Stonewall Grey + Off White + kropla Magic Blue","Basic Skintone":"Ivory 4 + Hot Orange 1 + Gorgon Brown 1","Bone White":"Ivory + kropla Earth","Earth":"Gorgon Brown + Bone White","Gorgon Brown":"Earth + kropla Black","Stonewall Grey":"Black + Off White 1:1","Chainmail":"Tinny Tin (ciemniejszy metal)","Glorious Gold":"Tinny Tin (ciemniejszy)","Tinny Tin":"Glorious Gold + wash Umber","Gory Red":"Scarlet Blood + kropla Black","Scarlet Blood":"Gory Red + kropla Hot Orange","Hot Orange":"Scarlet Blood + Moon Yellow","Moon Yellow":"Ivory + kropla Hot Orange","Yellow Green":"Lime Green","Lime Green":"Yellow Green + Moon Yellow","Scorpy Green":"Cayman Green + Yellow Green","Cayman Green":"Dark Green + Scorpy Green","Dark Green":"Cayman Green + kropla Black","Aquamarine":"Magic Blue + Cayman Green","wash Umber":"Gorgon Brown + Glaze Medium 1:6","wash Black":"Black + Glaze Medium 1:6"};
@@ -852,13 +853,15 @@ const E=[["Cienie",["#1c1a1a","#4a2a2c","#c9504a","#d98880"],"czernią",["#4a101
 $("errs").innerHTML=E.map(([h,b,bn,g,gn,p],k)=>`<div class="card"><h3>${h}</h3><div class="vs"><div><svg viewBox="0 0 200 210">${sphere(b,85,100,100,"e"+k+"b")}</svg><span class="mark" style="background:var(--bad)">✗</span>${bn}</div><div><svg viewBox="0 0 200 210">${sphere(g,85,100,100,"e"+k+"g")}</svg><span class="mark" style="background:var(--ok)">✓</span>${gn}</div></div><p>${p}</p></div>`).join("");
 
 // zakupy
-const BUY=[["Biały podkład w sprayu do zenithalu","np. Tamiya Fine Surface Primer biały albo Dupli-Color Filler biały"],["Klej cyjanoakrylowy w żelu","do sklejania PLA (Contacta nie klei)"],["Papier wodny 400 / 800 / 1000","szlif po Liquid Surface Primer"],["Bambu Lab hotend 0,2 mm FAH018","drobne detale na A1 mini"]];
-const HAVE=[["Zamówione 14.11: farby","Black 72051, Magic Blue 72021, Off White 72101, Wolf Grey 72047, Basic Skintone 70815"],["Zamówione 14.11: reszta","Tamiya Surface Primer szary (spray), Tamiya Liquid Surface Primer, Vallejo Glaze Medium, pędzel Precision 3"],["Vallejo Fantasy Paint Set 72203","12 farb Squidmar"],["Game Color: Aquamarine 72119, Gorgon Brown 72124, Earth 72062 ×2","Chainmail 72053, Stonewall Grey 72049, Bone White 72034"],["Washe: Black 73201, Umber 73203",""],["Vallejo Hobby Paint Black 28012 (spray)","+ Mecha Color Primer Black"],["AK Ultra Matt Varnish","lakier pędzlem"],["Vallejo Crackle Medium, AK Dark and Dry Crackle","spękana farba / spękana ziemia"],["Pędzle Vallejo Precision + Ammo Drybrush 4","+ Brush Cleaner"],["U-Star pilniki i kostki ścierne",""],["Mokra paleta (wydruk) + ściereczka celulozowa","papier do pieczenia na wierzch"],["Lampa LED 4000 K, CRI 95",""]];
-let done=store.get("done2",{});
-function list(id,arr,pre){$(id).innerHTML=arr.map(([t,s],i)=>{const k=pre+i,on=!!done[k];return `<label class="item${on?" done":""}"><input type="checkbox" data-k="${k}" ${on?"checked":""}><span><span class="t">${t}</span>${s?`<small>${s}</small>`:""}</span></label>`}).join("")}
+let BUY=store.get("buyL",[]),HAVE=store.get("haveL",[]);
+let done=store.get("done3",{});
+function list(id,arr,pre){$(id).innerHTML=arr.length?arr.map(([t,s],i)=>{const k=pre+t,on=!!done[k];return `<div class="item${on?" done":""}" style="display:flex;align-items:center"><label style="display:flex;gap:10px;flex:1;align-items:center"><input type="checkbox" data-k="${k}" ${on?"checked":""}><span><span class="t">${t}</span>${s?`<small>${s}</small>`:""}</span></label><button class="link" data-del="${pre}${i}" aria-label="Usuń">×</button></div>`}).join(""):'<p class="note">Pusto. Dopisz coś powyżej.</p>'}
 function lists(){list("buy",BUY,"b");list("have",HAVE,"h")}
-document.addEventListener("change",e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;done[k]=e.target.checked;store.set("done2",done);lists()});
-if(!Object.keys(done).length){HAVE.forEach((_,i)=>done["h"+i]=true)}
+const esc=t=>t.replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"})[c]);
+function addTo(which){const inp=$(which+"in"),t=esc(inp.value.trim());if(!t)return;(which==="buy"?BUY:HAVE).push([t,""]);store.set("buyL",BUY);store.set("haveL",HAVE);inp.value="";lists()}
+["buy","have"].forEach(w=>{$(w+"add").onclick=()=>addTo(w);$(w+"in").addEventListener("keydown",e=>{if(e.key==="Enter")addTo(w)})});
+document.addEventListener("click",e=>{const d=e.target.dataset&&e.target.dataset.del;if(!d)return;const arr=d[0]==="b"?BUY:HAVE;const it=arr.splice(+d.slice(1),1)[0];if(it)delete done[d[0]+it[0]];store.set("buyL",BUY);store.set("haveL",HAVE);store.set("done3",done);lists()});
+document.addEventListener("change",e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;done[k]=e.target.checked;store.set("done3",done);lists()});
 lists();
 
 
@@ -1084,7 +1087,7 @@ $("f2plan").onclick=()=>{const order=["plaszcz","koszula","spodnie","kapelusz","
  document.querySelector('#narzedzia .seg button[data-t="plan"]').click();pRender();$("pgen").textContent="Kolory przeniesione ze zdjęcia. Popraw części, które nie pasują.";window.scrollTo(0,0)};
 
 // ===== kopia zapasowa =====
-const KEYS=["own","low","prog","gal","custom","plans","plan","done2","fig","mat","base","timers","nozzle","tool","ip","lampk","lampb"];
+const KEYS=["own","low","prog","gal","custom","plans","plan","done3","buyL","haveL","inv","bc","invAdded","queue","brand","printer","fig","mat","base","timers","nozzle","tool","ip","lampk","lampb"];
 function exp(withImg){const o={app:"paleta-figurek",v:1,d:new Date().toISOString()};KEYS.forEach(k=>{try{const v=localStorage.getItem(k);if(v!==null)o[k]=JSON.parse(v)}catch(e){}});if(!withImg)delete o.gal;$("ktext").value=JSON.stringify(o);$("kmsg").textContent=`Gotowe: ${Math.round($("ktext").value.length/1024)} KB. Skopiuj i wklej w drugim miejscu.`}
 $("kexp").onclick=()=>exp(true);$("kexp2").onclick=()=>exp(false);
 $("kcopy").onclick=async()=>{try{await navigator.clipboard.writeText($("ktext").value);$("kmsg").textContent="Skopiowano do schowka."}catch(e){$("ktext").select();$("kmsg").textContent="Zaznaczyłem tekst — skopiuj go ręcznie."}};
@@ -1107,7 +1110,7 @@ let low=store.get("low",{});
 function lowRender(){const L=Object.keys(low).filter(k=>low[k]);
  $("lowl").innerHTML=L.length?L.map(n=>`<label class="item"><input type="checkbox" data-low="${n}"><span><span class="t">${n}</span><small>Vallejo ${CODE[n]||""} · zaznacz po zakupie</small></span></label>`).join(""):'<p class="note">Nic się nie kończy. W „Moje farby” dotknij „mało” przy farbie, która się kończy.</p>'}
 $("lowl").addEventListener("change",e=>{const n=e.target.dataset.low;if(!n)return;delete low[n];store.set("low",low);lowRender();ownRender2()});
-$("keep").onclick=async()=>{const lines=[...Object.keys(low).filter(k=>low[k]).map(n=>`Vallejo ${CODE[n]||""} ${n}`.replace(/\s+/g," ")),...BUY.filter((_,i)=>!done["b"+i]).map(([t])=>t)];const txt=lines.join("\n");try{await navigator.clipboard.writeText(txt);$("keepmsg").textContent=`Skopiowano ${lines.length} pozycji. W Google Keep utwórz listę i wklej.`}catch(e){$("keepmsg").textContent="Nie udało się skopiować automatycznie:";$("keeptxt").hidden=false;$("keeptxt").value=txt}};
+$("keep").onclick=async()=>{const lines=[...Object.keys(low).filter(k=>low[k]).map(n=>`Vallejo ${CODE[n]||""} ${n}`.replace(/\s+/g," ")),...BUY.filter(([t])=>!done["b"+t]).map(([t])=>t)];const txt=lines.join("\n");try{await navigator.clipboard.writeText(txt);$("keepmsg").textContent=`Skopiowano ${lines.length} pozycji. W Google Keep utwórz listę i wklej.`}catch(e){$("keepmsg").textContent="Nie udało się skopiować automatycznie:";$("keeptxt").hidden=false;$("keeptxt").value=txt}};
 function ownRender2(){document.querySelectorAll("#ownList .own").forEach(l=>{const n=l.querySelector("input").dataset.p;let b=l.querySelector(".lowb");if(!b){b=document.createElement("button");b.className="lowb";b.dataset.lp=n;l.after?null:0;l.appendChild(b)}b.textContent=low[n]?"kończy się":"mało";b.classList.toggle("on",!!low[n])})}
 $("ownList").addEventListener("click",e=>{const b=e.target.closest(".lowb");if(!b)return;e.preventDefault();const n=b.dataset.lp;low[n]=!low[n];if(!low[n])delete low[n];store.set("low",low);ownRender2();lowRender()});
 new MutationObserver(()=>ownRender2()).observe($("ownList"),{childList:true});
@@ -1173,7 +1176,7 @@ const LEGR={};Object.entries(LEG).forEach(([n,k])=>{if(DBK[k])LEGR[k]=n});
 const dispName=r=>{const k=dk(r);if(LEGR[k])return LEGR[k];const base=r[5]==="w"?"wash "+r[2]:r[2];return base+" ("+BN[r[0]]+")"};
 const codeTxt=r=>`${BN[r[0]]} ${r[1]}${r[3]?" "+r[3]:""}`;
 let inv=store.get("inv",null);
-if(!inv){inv=Object.keys(LEG).filter(n=>own[n]!==false&&DBK[LEG[n]]).map(n=>LEG[n]);["V|Hobby Paint|Black"].forEach(k=>{if(DBK[k]&&!inv.includes(k))inv.push(k)});store.set("inv",inv)}
+if(!inv){inv=[];store.set("inv",inv)}
 let bc=store.get("bc",{});let added=store.get("invAdded",[]);
 function syncInv(){const has=new Set(inv);
  Object.entries(LEG).forEach(([n,k])=>{if(DBK[k]){own[n]=has.has(k);const r=DBK[k];if(r[5]!=="m")P[n]=r[4]}});
