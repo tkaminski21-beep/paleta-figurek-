@@ -186,6 +186,17 @@ code{font-size:13px;overflow-wrap:anywhere}
 .tbnav button:disabled{opacity:.4}
 [hidden]{display:none!important}
 #hinv:empty,#hres:empty{display:none}
+.aibox{margin-top:12px;display:block}
+#aiwish{width:100%}
+.tpart{background:var(--card);border-radius:16px;padding:12px;margin-top:10px}
+.tpart h4{margin:0 0 6px;display:flex;align-items:center;gap:10px;font-size:15.5px}
+.tpart h4 i{width:30px;height:30px;border-radius:9px;flex:none;box-shadow:inset 0 -4px 0 rgba(0,0,0,.15)}
+.tpart .tp3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}
+.tpart .tp3 div{background:var(--bg);border-radius:10px;padding:6px;font-size:12.5px;line-height:1.25}
+.tpart .tp3 div i{display:block;height:22px;border-radius:6px;margin-bottom:4px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
+.tpart .tp3 small{color:var(--quiet);display:block}
+.tpart p{margin:6px 0 0;font-size:14.5px}
+.tsteps{margin:8px 0 0;padding-left:22px}.tsteps li{margin:4px 0}
 #tcan{display:block;width:100%;height:auto;border-radius:14px;margin-top:10px;touch-action:none;background:var(--card)}
 #tpal .chip i{width:24px;height:24px;border-radius:50%;flex:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
 #tpal .chip[aria-pressed=true] i{box-shadow:0 0 0 2px var(--bg)}
@@ -467,9 +478,19 @@ code{font-size:13px;overflow-wrap:anywhere}
    <div class="chips" id="tpal" role="group" aria-label="Kolor"></div>
    <label class="fl" for="tsize"><span id="tsl">Czułość obszaru</span> <b id="tsv"></b></label>
    <input type="range" id="tsize" min="4" max="60" value="18">
+   <div class="card aibox" id="aibox" hidden>
+    <b>Pomaluj automatycznie</b>
+    <p class="note" style="margin:4px 0 8px">Claude obejrzy zdjęcie, rozpozna części figurki, pomaluje je i opisze, czym i jak malować.</p>
+    <label class="own" style="max-width:none"><input type="checkbox" id="aiharm" checked><span>Trzymaj się wybranej harmonii</span></label>
+    <input id="aiwish" type="text" maxlength="120" placeholder="Życzenia, np. „kowboj, brązy i czerwony szal”" style="margin-top:8px">
+    <button class="prim gbtn" id="aigo" style="margin-top:8px;width:100%">Pomaluj i opisz</button>
+    <p class="note" id="aimsg" role="status"></p>
+   </div>
+   <p class="note" id="aioff" hidden>Automatyczne rozpoznawanie części działa w wersji przeglądarkowej aplikacji (otwartej w Claude). Tutaj pomaluj obszary sam, a potem dotknij „Opisz malowanie”.</p>
    <canvas id="tcan"></canvas>
    <div class="gen"><button id="tundo">Cofnij</button><button id="treset">Od nowa</button><button id="tcmp">Pokaż oryginał</button></div>
-   <div class="gen"><button id="tsave" class="prim">Zapisz w galerii</button></div>
+   <div class="gen"><button id="tdesc">Opisz malowanie</button><button id="tsave" class="prim">Zapisz w galerii</button></div>
+   <div id="tplan"></div>
    <p class="note" id="tmsg" role="status"></p>
   </div>
  </div>
@@ -1377,6 +1398,7 @@ function hRender(){$("hcol").value=hbase;$("hsw").style.background=hbase;
  window.HPAL=[];const seenP=new Set();ord.forEach(t=>{const m=best(t.hex,ir.length?ir:pool,1)[0];[[t.hex,t.main?"główny":t.lab],...(m?[[m[0][4],dispName(m[0])]]:[])].forEach(([h,n])=>{if(!seenP.has(h)){seenP.add(h);HPAL.push([h,n])}})});
  if(window.tPalRender)tPalRender();
  store.set("hmode",hm);store.set("hwheel",hw);store.set("hbase",hbase)}
+window.HBEST=best;window.HPOOL=brandPool;
 $("hmode").addEventListener("click",e=>{const b=e.target.closest("[data-h]");if(!b)return;hm=b.dataset.h;hRender()});
 $("hwheel").addEventListener("click",e=>{const b=e.target.closest("[data-w]");if(!b)return;hw=b.dataset.w;hRender()});
 $("hcol").addEventListener("input",e=>{hbase=e.target.value;hRender()});
@@ -1402,9 +1424,10 @@ function load(file){const r=new FileReader();r.onload=()=>{const im=new Image();
  const d=orig.data,n=W*H;Y=new Float32Array(n);LB=new Float32Array(n*3);
  for(let i=0;i<n;i++){const R=LUT[d[i*4]],G=LUT[d[i*4+1]],B=LUT[d[i*4+2]];const y=R*.2126+G*.7152+B*.0722;Y[i]=y;
   const x=(R*.4124+G*.3576+B*.1805)/.95047,z=(R*.0193+G*.1192+B*.9505)/1.08883,f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116,fx=f(x),fy=f(y),fz=f(z);LB[i*3]=116*fy-16;LB[i*3+1]=500*(fx-fy);LB[i*3+2]=200*(fy-fz)}
- undo=[];$("tbox").hidden=false;$("tmsg").textContent="";tPalRender();C.scrollIntoView({behavior:"smooth",block:"center"})};im.src=r.result};r.readAsDataURL(file)}
-function paint(idx,yref){const t=hx(tcol).map(v=>LUT[v]),d=cur.data;for(const i of idx){const k=Math.min(1.8,Y[i]/yref);d[i*4]=enc(t[0]*k);d[i*4+1]=enc(t[1]*k);d[i*4+2]=enc(t[2]*k)}X.putImageData(cur,0,0)}
-function push(){undo.push(new Uint8ClampedArray(cur.data));if(undo.length>12)undo.shift()}
+ undo=[];ops=[];parts=null;$("tplan").innerHTML="";$("tbox").hidden=false;$("tmsg").textContent="";tPalRender();C.scrollIntoView({behavior:"smooth",block:"center"})};im.src=r.result};r.readAsDataURL(file)}
+let ops=[],parts=null;
+function paint(idx,yref,col){col=col||tcol;if(ops.length)ops[ops.length-1].n+=idx.length,ops[ops.length-1].c=col;const t=hx(col).map(v=>LUT[v]),d=cur.data;for(const i of idx){const k=Math.min(1.8,Y[i]/yref);d[i*4]=enc(t[0]*k);d[i*4+1]=enc(t[1]*k);d[i*4+2]=enc(t[2]*k)}X.putImageData(cur,0,0)}
+function push(){undo.push(new Uint8ClampedArray(cur.data));ops.push({c:tcol,n:0});if(undo.length>12){undo.shift();ops.shift()}}
 function fill(px,py){const tol=+$("tsize").value,s0=py*W+px,L0=LB[s0*3],a0=LB[s0*3+1],b0=LB[s0*3+2];const seen=new Uint8Array(W*H),q=new Int32Array(W*H);let h=0,t=0;q[t++]=s0;seen[s0]=1;const out=[];let ys=0;
  while(h<t){const i=q[h++];out.push(i);ys+=Y[i];const x=i%W,y=(i-x)/W;
   for(const j of [x>0?i-1:-1,x<W-1?i+1:-1,y>0?i-W:-1,y<H-1?i+W:-1]){if(j<0||seen[j])continue;const dl=(LB[j*3]-LB[i*3])*.8,da=LB[j*3+1]-LB[i*3+1],db=LB[j*3+2]-LB[i*3+2],sl=(LB[j*3]-L0)*.35,sa=(LB[j*3+1]-a0)*1.6,sb=(LB[j*3+2]-b0)*1.6,t1=tol*.3,t2=tol*1.8;if(dl*dl+da*da+db*db<=t1*t1&&sl*sl+sa*sa+sb*sb<=t2*t2){seen[j]=1;q[t++]=j}}}
@@ -1422,15 +1445,68 @@ $("tphoto").addEventListener("change",e=>{const f=e.target.files[0];if(f)load(f)
 $("tmode").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b)return;tm=b.dataset.m;hint()});
 $("tsize").addEventListener("input",()=>{$("tsv").textContent=$("tsize").value;store.set(tm==="fill"?"ttol":"tbr",+$("tsize").value)});
 $("tpal").addEventListener("click",e=>{const b=e.target.closest("[data-tc]");if(!b)return;tcol=b.dataset.tc;tPalRender()});
-$("tundo").onclick=()=>{if(!undo.length)return;cur.data.set(undo.pop());X.putImageData(cur,0,0)};
-$("treset").onclick=()=>{if(!orig)return;push();cur.data.set(orig.data);X.putImageData(cur,0,0)};
+$("tundo").onclick=()=>{if(!undo.length)return;cur.data.set(undo.pop());ops.pop();X.putImageData(cur,0,0)};
+$("treset").onclick=()=>{if(!orig)return;undo=[];ops=[];parts=null;$("tplan").innerHTML="";cur.data.set(orig.data);X.putImageData(cur,0,0)};
 $("tcmp").onclick=()=>{if(!orig)return;cmp=!cmp;X.putImageData(cmp?orig:cur,0,0);$("tcmp").textContent=cmp?"Pokaż przymiarkę":"Pokaż oryginał"};
 
 $("tsave").onclick=()=>{if(!cur)return;X.putImageData(cur,0,0);cmp=false;$("tcmp").textContent="Pokaż oryginał";
  const sm=(cv)=>{const k=Math.min(1,720/Math.max(W,H)),c=document.createElement("canvas");c.width=Math.round(W*k);c.height=Math.round(H*k);c.getContext("2d").drawImage(cv,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.72)};
  const oc=document.createElement("canvas");oc.width=W;oc.height=H;oc.getContext("2d").putImageData(orig,0,0);
- const it={n:"Przymiarka: "+(HM.find(x=>x[0]===hm)||[0,""])[1],d:new Date().toLocaleDateString("pl-PL"),a:sm(oc),b:sm(C)};
+ const it={n:parts&&parts.figurka?"Przymiarka: "+parts.figurka:"Przymiarka kolorów",d:new Date().toLocaleDateString("pl-PL"),a:sm(oc),b:sm(C)};
  const next=[it,...gal];try{localStorage.setItem("gal",JSON.stringify(next));gal.unshift(it);gRender();$("tmsg").textContent="Zapisano w Figurki → Galeria (przed i po)."}catch(e){$("tmsg").textContent="Brak miejsca w pamięci. Usuń starsze wpisy z galerii."}};
+
+// --- opis malowania ---
+const tShade=h=>toHex(hx(h).map(v=>v*.55)),tTint=h=>toHex(hx(h).map(v=>v+(255-v)*.4));
+function pick(hex){const ir=invRows(),[b,pool]=HPOOL();const src=ir.length?ir:pool;const m=HBEST(hex,src,1)[0]||HBEST(hex,pool,1)[0];return m?m[0]:null}
+function byName(n){if(!n)return null;const q=n.toLowerCase().replace(/\(.*?\)/g,"").trim();const ir=invRows(),[b]=HPOOL();
+ const M=DB.filter(r=>r[2].toLowerCase()===q).sort((x,y)=>(y[0]===b)-(x[0]===b)||CORE[y[0]].test(y[1])-CORE[x[0]].test(x[1]));return ir.find(r=>r[2].toLowerCase()===q)||M[0]||null}
+function pbox(lbl,r,hex){return `<div><i style="background:${r?r[4]:hex}"></i>${lbl}<br><b>${r?dispName(r):"mieszanka"}</b>${r?`<small>${codeTxt(r)}${inv.includes(dk(r))?" · masz":""}</small>`:""}</div>`}
+function planHTML(P,steps,head){const esc=t=>String(t||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"})[c]);
+ return (head?`<h2 class="secth">${esc(head)}</h2>`:`<h2 class="secth">Jak to pomalować</h2>`)+P.map(p=>{const b=byName(p.farba)||pick(p.kolor),sh=byName(p.cien)||pick(tShade(p.kolor)),hi=byName(p.swiatlo)||pick(tTint(p.kolor));
+  return `<div class="tpart"><h4><i style="background:${p.kolor}"></i>${esc(p.nazwa)}</h4><div class="tp3">${pbox("Baza",b,p.kolor)}${pbox("Cień",sh,tShade(p.kolor))}${pbox("Światło",hi,tTint(p.kolor))}</div>${p.jak?`<p>${esc(p.jak)}</p>`:""}</div>`}).join("")
+  +`<div class="tip" style="margin-top:12px"><b>Kolejność:</b><ol class="tsteps">${steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>`}
+const STEPS=["Podkład w sprayu (szary, a na jasne kolory biały). Odczekaj kilka godzin.","Bazy od środka na zewnątrz: najpierw skóra, potem ubranie, na końcu pasy, metal i drobne detale. Każdą warstwę 2 cienkie warstwy farby rozcieńczonej 1:1.","Cienie: wash albo ciemniejsza farba w zagłębienia (fałdy, szwy, pod pasem).","Światła: jaśniejsza farba na wypukłe krawędzie (fałdy od góry, nos, kostki).","Detale: oczy, guziki, sprzączki, metal.","Lakier matowy na koniec."];
+$("tdesc").onclick=()=>{if(parts){$("tplan").innerHTML=planHTML(parts.czesci,parts.kolejnosc||STEPS,parts.figurka);return}
+ const m=new Map();ops.forEach(o=>{if(o.n)m.set(o.c,(m.get(o.c)||0)+o.n)});
+ if(!m.size){$("tmsg").textContent="Najpierw pomaluj coś na zdjęciu.";return}
+ const arr=[...m.entries()].sort((a,b)=>b[1]-a[1]),pal=window.HPAL||[];
+ const P=arr.map(([c,n],i)=>{const nm=(pal.find(x=>x[0]===c)||[0,""])[1];return {nazwa:(i===0?"Kolor główny":i===arr.length-1&&arr.length>2?"Akcent":"Kolor "+(i+1))+(nm&&!/^[+-]?\d|główny/.test(nm)?" — "+nm:""),kolor:c,jak:i===0?"Największe powierzchnie. Maluj warstwami, zacznij od bazy, potem cień i światło.":i===arr.length-1&&arr.length>2?"Mały akcent przyciąga wzrok — połóż go blisko twarzy albo na ważnym detalu.":"Drugi plan: ubranie, pasy, dodatki."}});
+ $("tplan").innerHTML=planHTML(P,STEPS);$("tplan").scrollIntoView({behavior:"smooth",block:"start"})};
+
+// --- automat z Claude (tylko wersja przeglądarkowa) ---
+let SAMPLE=null;
+(async()=>{try{if(!window.claude||!window.claude.use){$("aioff").hidden=false;return}const sm=await window.claude.use("sample");
+ if(sm&&(await sm.limits()).images){SAMPLE=sm;$("aibox").hidden=false}else $("aioff").hidden=false}catch(e){$("aioff").hidden=false}})();
+setTimeout(()=>{if(!SAMPLE)$("aioff").hidden=false},11000);
+function inPoly(x,y,pts){let c=false;for(let i=0,j=pts.length-1;i<pts.length;j=i++){const [xi,yi]=pts[i],[xj,yj]=pts[j];if(((yi>y)!==(yj>y))&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
+let BG=null;function bgEst(){const L=[];for(let x=0;x<W;x+=4){L.push(x,(H-1)*W+x)}for(let y=0;y<H;y+=4){L.push(y*W,y*W+W-1)}
+ const v=L.map(i=>[LB[i*3],LB[i*3+1],LB[i*3+2]]);const med=k=>v.map(q=>q[k]).sort((a,b)=>a-b)[v.length>>1];const m=[med(0),med(1),med(2)];
+ const near=v.filter(q=>Math.hypot(q[0]-m[0],q[1]-m[1],q[2]-m[2])<9).length;BG=near>v.length*.6?m:null}
+function fillPoly(pts,col){const P=pts.map(([x,y])=>[x*W,y*H]);let x0=W,x1=0,y0=H,y1=0;P.forEach(([x,y])=>{x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)});
+ const idx=[];let ys=0;for(let y=Math.max(0,Math.floor(y0));y<=Math.min(H-1,Math.ceil(y1));y++)for(let x=Math.max(0,Math.floor(x0));x<=Math.min(W-1,Math.ceil(x1));x++)if(inPoly(x+.5,y+.5,P)){const i=y*W+x;if(BG&&Math.hypot(LB[i*3]-BG[0],LB[i*3+1]-BG[1],LB[i*3+2]-BG[2])<9)continue;idx.push(i);ys+=Y[i]}
+ if(!idx.length)return;const yr=ys/idx.length;ops.push({c:col,n:0});undo.push(new Uint8ClampedArray(cur.data));paint(idx,yr,col)}
+$("aigo").onclick=async()=>{if(!SAMPLE||!cur)return;const btn=$("aigo");btn.disabled=true;$("aimsg").textContent="Claude ogląda figurkę…";
+ try{const k=Math.min(1,768/Math.max(W,H)),c=document.createElement("canvas");c.width=Math.round(W*k);c.height=Math.round(H*k);c.getContext("2d").putImageData(orig,0,0);
+  const c2=document.createElement("canvas");c2.width=c.width;c2.height=c.height;c2.getContext("2d").drawImage(c,0,0);
+  const blob=await new Promise(r=>c2.toBlob(r,"image/jpeg",.85));
+  const [b,pool]=HPOOL(),ir=invRows();
+  const names=(ir.length?ir:pool).filter(r=>r[5]!=="m").slice(0,220).map(r=>r[2]+(r[5]==="w"?" (wash)":""));
+  const metals=DB.filter(r=>r[0]===b&&r[5]==="m"&&CORE[b].test(r[1])).slice(0,12).map(r=>r[2]);
+  const harm=$("aiharm").checked&&window.HPAL?HPAL.filter((x,i)=>i%2===0).map(x=>x[0]).join(", "):"";
+  const prompt=`Jesteś doświadczonym malarzem figurek. Na zdjęciu jest NIEPOMALOWANA figurka (wydruk 3D albo po podkładzie). Rozpoznaj, kogo przedstawia i z jakich części się składa (np. skóra twarzy i dłoni, włosy, kapelusz, koszula, płaszcz, spodnie, buty, pas, broń, metal, podstawka).
+Zaproponuj schemat kolorów${harm?` oparty na tych kolorach harmonii: ${harm}`:""}${$("aiwish").value.trim()?`. Życzenia użytkownika: ${$("aiwish").value.trim()}`:""}.
+Farby wybieraj TYLKO z tej listy (${ir.length?"inwentarz użytkownika":"marka "+BN[b]}): ${names.join("; ")}. Metaliczne: ${metals.join("; ")}.
+Dla każdej części podaj obrys jako wielokąt we współrzędnych zdjęcia znormalizowanych 0–1 (x od lewej, y od góry), 6–24 punktów, dokładnie po krawędziach tej części. Części podaj w kolejności od największych do najmniejszych (mniejsze zostaną namalowane na wierzchu). Nie obrysowuj tła.
+Odpowiedz WYŁĄCZNIE JSON-em po polsku:
+{"figurka":"krótko kto to","czesci":[{"nazwa":"Płaszcz","kolor":"#rrggbb","farba":"nazwa z listy","cien":"nazwa z listy lub wash","swiatlo":"nazwa z listy","jak":"1–2 zdania jak malować tę część","obrys":[[x,y],...]}],"kolejnosc":["krok 1","krok 2","..."]}`;
+  const res=await SAMPLE.json(prompt,{images:[blob],modelTier:"complex"});
+  if(!res||!Array.isArray(res.czesci)||!res.czesci.length)throw {message:"pusta odpowiedź"};
+  cur.data.set(orig.data);ops=[];undo=[];bgEst();
+  res.czesci.forEach(p=>{if(!/^#[0-9a-f]{6}$/i.test(p.kolor||"")){const r=byName(p.farba);p.kolor=r?r[4]:"#888888"}const r=byName(p.farba);const col=r&&r[5]!=="w"?r[4]:p.kolor;if(Array.isArray(p.obrys)&&p.obrys.length>=3)fillPoly(p.obrys.map(q=>[+q[0],+q[1]]),col)});
+  X.putImageData(cur,0,0);parts=res;$("tplan").innerHTML=planHTML(res.czesci,res.kolejnosc&&res.kolejnosc.length?res.kolejnosc:STEPS,res.figurka);
+  $("aimsg").textContent="Gotowe. Obrysy są przybliżone — popraw Pędzlem albo Obszarem.";
+ }catch(e){$("aimsg").textContent=e&&e.code==="not_granted"?"Brak zgody na użycie Claude.":e&&e.code==="rate_limited"?"Za dużo zapytań, spróbuj za chwilę.":"Nie udało się: "+((e&&e.message)||"błąd")}
+ btn.disabled=false};
 hint();tPalRender();
 }
 
