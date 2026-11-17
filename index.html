@@ -186,6 +186,10 @@ code{font-size:13px;overflow-wrap:anywhere}
 .tbnav button:disabled{opacity:.4}
 [hidden]{display:none!important}
 #hinv:empty,#hres:empty{display:none}
+#tcan{display:block;width:100%;height:auto;border-radius:14px;margin-top:10px;touch-action:none;background:var(--card)}
+#tpal .chip i{width:24px;height:24px;border-radius:50%;flex:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+#tpal .chip[aria-pressed=true] i{box-shadow:0 0 0 2px var(--bg)}
+#tdl{display:flex;align-items:center;justify-content:center}
 .hbase{display:flex;gap:10px;align-items:center;margin-top:12px}
 .hpick{position:relative;width:56px;height:56px;flex:none;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1.5px var(--line)}
 .hpick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
@@ -454,6 +458,20 @@ code{font-size:13px;overflow-wrap:anywhere}
   <p class="note" style="text-align:center;margin-top:-4px">Dotknij koła, żeby zmienić odcień.</p>
   <div class="tip" id="hdesc"></div>
   <div id="hout"></div>
+  <h2 class="secth">Przymierz na zdjęciu</h2>
+  <p class="lead">Wczytaj zdjęcie figurki i pomaluj je kolorami z harmonii. Cienie i światła zostają ze zdjęcia, zmienia się tylko kolor.</p>
+  <label class="gbtn filebtn" style="margin-top:10px">Wczytaj zdjęcie<input type="file" id="tphoto" accept="image/*"></label>
+  <div id="tbox" hidden>
+   <div class="seg" role="group" aria-label="Tryb" id="tmode" style="margin-top:12px"><button data-m="fill" aria-pressed="true">Obszar</button><button data-m="brush" aria-pressed="false">Pędzel</button></div>
+   <p class="note" id="thint"></p>
+   <div class="chips" id="tpal" role="group" aria-label="Kolor"></div>
+   <label class="fl" for="tsize"><span id="tsl">Czułość obszaru</span> <b id="tsv"></b></label>
+   <input type="range" id="tsize" min="4" max="60" value="18">
+   <canvas id="tcan"></canvas>
+   <div class="gen"><button id="tundo">Cofnij</button><button id="treset">Od nowa</button><button id="tcmp">Pokaż oryginał</button></div>
+   <div class="gen"><button id="tsave" class="prim">Zapisz w galerii</button><a id="tdl" class="gbtn" download="przymiarka.jpg" style="margin-top:0;text-align:center">Pobierz obraz</a></div>
+   <p class="note" id="tmsg" role="status"></p>
+  </div>
  </div>
  <div class="tool" id="t-kopia" hidden>
   <p class="lead">Strona w przeglądarce i aplikacja na telefonie mają osobne dane. Skopiuj je tutaj i wklej w drugim miejscu.</p>
@@ -1356,6 +1374,8 @@ function hRender(){$("hcol").value=hbase;$("hsw").style.background=hbase;
  $("hout").innerHTML=out+`<p class="note">◎ ustawia farbę jako nowy kolor główny. Koło malarskie (czerwony–zielony, niebieski–pomarańczowy, żółty–fioletowy) to to, którego uczą malarze. Koło cyfrowe działa jak w programach graficznych.</p>`;
  const inv5=ir.filter(r=>r[5]===""||r[5]===undefined).slice(0,30);
  $("hinv").innerHTML=ir.length?inv5.map(r=>`<button class="chip" data-hb="${r[4]}"><span class="dot" style="width:22px;height:22px;border-radius:50%;background:${r[4]}"></span>${dispName(r)}</button>`).join(""):"";
+ window.HPAL=[];const seenP=new Set();ord.forEach(t=>{const m=best(t.hex,ir.length?ir:pool,1)[0];[[t.hex,t.main?"główny":t.lab],...(m?[[m[0][4],dispName(m[0])]]:[])].forEach(([h,n])=>{if(!seenP.has(h)){seenP.add(h);HPAL.push([h,n])}})});
+ if(window.tPalRender)tPalRender();
  store.set("hmode",hm);store.set("hwheel",hw);store.set("hbase",hbase)}
 $("hmode").addEventListener("click",e=>{const b=e.target.closest("[data-h]");if(!b)return;hm=b.dataset.h;hRender()});
 $("hwheel").addEventListener("click",e=>{const b=e.target.closest("[data-w]");if(!b)return;hw=b.dataset.w;hRender()});
@@ -1367,6 +1387,53 @@ $("hq").addEventListener("input",()=>{const q=$("hq").value.trim().toLowerCase()
  const r=DB.filter(x=>x[5]!=="m"&&(x[2].toLowerCase().includes(q)||x[3].includes(q))).slice(0,8);
  $("hres").innerHTML=r.map(x=>`<div class="hpaint"><i style="background:${x[4]}"></i><span>${dispName(x)}<small>${codeTxt(x)}</small></span><button class="link" data-hb="${x[4]}">Wybierz</button></div>`).join("")||'<p class="note">Nic nie znalazłem.</p>'});
 hRender();
+
+// ===== przymiarka kolorów na zdjęciu =====
+{
+const C=$("tcan"),X=C.getContext("2d",{willReadFrequently:true});let W=0,H=0,orig=null,cur=null,Y=null,LB=null,undo=[],tm="fill",tcol=null,cmp=false,src=null;
+const LUT=new Float32Array(256);for(let i=0;i<256;i++){const v=i/255;LUT[i]=v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)}
+const enc=v=>{v=Math.max(0,Math.min(1,v));return Math.round(255*(v<=.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-.055))};
+window.tPalRender=function(){const pal=window.HPAL||[];if(!tcol||!pal.some(p=>p[0]===tcol))tcol=pal[0]?pal[0][0]:"#b8222b";
+ $("tpal").innerHTML=pal.map(([h,n])=>`<button class="chip" data-tc="${h}" aria-pressed="${h===tcol}"><i style="background:${h}"></i>${n}</button>`).join("")};
+function hint(){$("thint").textContent=tm==="fill"?"Dotknij części figurki (np. płaszcza). Zamaluje podobny kolor wokół. Jak łapie za dużo, zmniejsz czułość.":"Maluj palcem po zdjęciu. Dobre do szarych wydruków po podkładzie, gdzie wszystko ma ten sam kolor.";
+ $("tsl").textContent=tm==="fill"?"Czułość obszaru":"Rozmiar pędzla";$("tsize").value=store.get(tm==="fill"?"ttol":"tbr",tm==="fill"?12:14);$("tsv").textContent=$("tsize").value;
+ document.querySelectorAll("#tmode button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===tm))}
+function load(file){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height));W=C.width=Math.round(im.width*k);H=C.height=Math.round(im.height*k);X.drawImage(im,0,0,W,H);orig=X.getImageData(0,0,W,H);cur=X.getImageData(0,0,W,H);src=r.result;
+ const d=orig.data,n=W*H;Y=new Float32Array(n);LB=new Float32Array(n*3);
+ for(let i=0;i<n;i++){const R=LUT[d[i*4]],G=LUT[d[i*4+1]],B=LUT[d[i*4+2]];const y=R*.2126+G*.7152+B*.0722;Y[i]=y;
+  const x=(R*.4124+G*.3576+B*.1805)/.95047,z=(R*.0193+G*.1192+B*.9505)/1.08883,f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116,fx=f(x),fy=f(y),fz=f(z);LB[i*3]=116*fy-16;LB[i*3+1]=500*(fx-fy);LB[i*3+2]=200*(fy-fz)}
+ undo=[];$("tbox").hidden=false;$("tmsg").textContent="";tPalRender();C.scrollIntoView({behavior:"smooth",block:"center"})};im.src=r.result};r.readAsDataURL(file)}
+function paint(idx,yref){const t=hx(tcol).map(v=>LUT[v]),d=cur.data;for(const i of idx){const k=Math.min(1.8,Y[i]/yref);d[i*4]=enc(t[0]*k);d[i*4+1]=enc(t[1]*k);d[i*4+2]=enc(t[2]*k)}X.putImageData(cur,0,0)}
+function push(){undo.push(new Uint8ClampedArray(cur.data));if(undo.length>12)undo.shift()}
+function fill(px,py){const tol=+$("tsize").value,s0=py*W+px,L0=LB[s0*3],a0=LB[s0*3+1],b0=LB[s0*3+2];const seen=new Uint8Array(W*H),q=new Int32Array(W*H);let h=0,t=0;q[t++]=s0;seen[s0]=1;const out=[];let ys=0;
+ while(h<t){const i=q[h++];out.push(i);ys+=Y[i];const x=i%W,y=(i-x)/W;
+  for(const j of [x>0?i-1:-1,x<W-1?i+1:-1,y>0?i-W:-1,y<H-1?i+W:-1]){if(j<0||seen[j])continue;const dl=(LB[j*3]-LB[i*3])*.8,da=LB[j*3+1]-LB[i*3+1],db=LB[j*3+2]-LB[i*3+2],sl=(LB[j*3]-L0)*.35,sa=(LB[j*3+1]-a0)*1.6,sb=(LB[j*3+2]-b0)*1.6,t1=tol*.3,t2=tol*1.8;if(dl*dl+da*da+db*db<=t1*t1&&sl*sl+sa*sa+sb*sb<=t2*t2){seen[j]=1;q[t++]=j}}}
+ push();paint(out,ys/out.length||.2);$("tmsg").textContent=`Zamalowano ${Math.round(out.length/(W*H)*100)}% zdjęcia.`}
+let drawing=false,yref=.2,last=null;
+function pos(e){const r=C.getBoundingClientRect();return [Math.floor((e.clientX-r.left)/r.width*W),Math.floor((e.clientY-r.top)/r.height*H)]}
+function dab(x,y){const rad=+$("tsize").value*W/400,r2=rad*rad,idx=[];for(let yy=Math.max(0,Math.floor(y-rad));yy<=Math.min(H-1,y+rad);yy++)for(let xx=Math.max(0,Math.floor(x-rad));xx<=Math.min(W-1,x+rad);xx++)if((xx-x)**2+(yy-y)**2<=r2)idx.push(yy*W+xx);paint(idx,yref)}
+function stroke(a,b){const dist=Math.hypot(b[0]-a[0],b[1]-a[1]),st=Math.max(1,+$("tsize").value*W/1200),n=Math.ceil(dist/st);for(let k=0;k<=n;k++)dab(a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n)}
+C.addEventListener("pointerdown",e=>{if(!cur||cmp)return;const [x,y]=pos(e);if(x<0||y<0||x>=W||y>=H)return;
+ if(tm==="fill"){fill(x,y);return}
+ C.setPointerCapture(e.pointerId);drawing=true;push();let s=0,c=0;for(let yy=Math.max(0,y-3);yy<=Math.min(H-1,y+3);yy++)for(let xx=Math.max(0,x-3);xx<=Math.min(W-1,x+3);xx++){s+=Y[yy*W+xx];c++}yref=Math.max(.02,s/c);last=[x,y];dab(x,y)});
+C.addEventListener("pointermove",e=>{if(!drawing)return;const p=pos(e);stroke(last,p);last=p});
+["pointerup","pointercancel"].forEach(ev=>C.addEventListener(ev,()=>{drawing=false}));
+$("tphoto").addEventListener("change",e=>{const f=e.target.files[0];if(f)load(f)});
+$("tmode").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b)return;tm=b.dataset.m;hint()});
+$("tsize").addEventListener("input",()=>{$("tsv").textContent=$("tsize").value;store.set(tm==="fill"?"ttol":"tbr",+$("tsize").value)});
+$("tpal").addEventListener("click",e=>{const b=e.target.closest("[data-tc]");if(!b)return;tcol=b.dataset.tc;tPalRender()});
+$("tundo").onclick=()=>{if(!undo.length)return;cur.data.set(undo.pop());X.putImageData(cur,0,0)};
+$("treset").onclick=()=>{if(!orig)return;push();cur.data.set(orig.data);X.putImageData(cur,0,0)};
+$("tcmp").onclick=()=>{if(!orig)return;cmp=!cmp;X.putImageData(cmp?orig:cur,0,0);$("tcmp").textContent=cmp?"Pokaż przymiarkę":"Pokaż oryginał"};
+$("tdl").addEventListener("click",()=>{if(!cur)return;X.putImageData(cur,0,0);$("tdl").href=C.toDataURL("image/jpeg",.9)});
+$("tsave").onclick=()=>{if(!cur)return;X.putImageData(cur,0,0);cmp=false;$("tcmp").textContent="Pokaż oryginał";
+ const sm=(cv)=>{const k=Math.min(1,720/Math.max(W,H)),c=document.createElement("canvas");c.width=Math.round(W*k);c.height=Math.round(H*k);c.getContext("2d").drawImage(cv,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.72)};
+ const oc=document.createElement("canvas");oc.width=W;oc.height=H;oc.getContext("2d").putImageData(orig,0,0);
+ const it={n:"Przymiarka: "+(HM.find(x=>x[0]===hm)||[0,""])[1],d:new Date().toLocaleDateString("pl-PL"),a:sm(oc),b:sm(C)};
+ const next=[it,...gal];try{localStorage.setItem("gal",JSON.stringify(next));gal.unshift(it);gRender();$("tmsg").textContent="Zapisano w Figurki → Galeria (przed i po)."}catch(e){$("tmsg").textContent="Brak miejsca w pamięci. Usuń starsze wpisy z galerii."}};
+hint();tPalRender();
+}
+
 const _ba=brandAll;
 ["bsel1","bsel2"].forEach(i=>$(i).addEventListener("change",()=>{try{hRender()}catch(e){}}));
 }
