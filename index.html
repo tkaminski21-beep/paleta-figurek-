@@ -469,7 +469,7 @@ code{font-size:13px;overflow-wrap:anywhere}
    <input type="range" id="tsize" min="4" max="60" value="18">
    <canvas id="tcan"></canvas>
    <div class="gen"><button id="tundo">Cofnij</button><button id="treset">Od nowa</button><button id="tcmp">Pokaż oryginał</button></div>
-   <div class="gen"><button id="tsave" class="prim">Zapisz w galerii</button><a id="tdl" class="gbtn" download="przymiarka.jpg" style="margin-top:0;text-align:center">Pobierz obraz</a></div>
+   <div class="gen"><button id="tsave" class="prim">Zapisz w galerii</button></div>
    <p class="note" id="tmsg" role="status"></p>
   </div>
  </div>
@@ -1425,7 +1425,7 @@ $("tpal").addEventListener("click",e=>{const b=e.target.closest("[data-tc]");if(
 $("tundo").onclick=()=>{if(!undo.length)return;cur.data.set(undo.pop());X.putImageData(cur,0,0)};
 $("treset").onclick=()=>{if(!orig)return;push();cur.data.set(orig.data);X.putImageData(cur,0,0)};
 $("tcmp").onclick=()=>{if(!orig)return;cmp=!cmp;X.putImageData(cmp?orig:cur,0,0);$("tcmp").textContent=cmp?"Pokaż przymiarkę":"Pokaż oryginał"};
-$("tdl").addEventListener("click",()=>{if(!cur)return;X.putImageData(cur,0,0);$("tdl").href=C.toDataURL("image/jpeg",.9)});
+
 $("tsave").onclick=()=>{if(!cur)return;X.putImageData(cur,0,0);cmp=false;$("tcmp").textContent="Pokaż oryginał";
  const sm=(cv)=>{const k=Math.min(1,720/Math.max(W,H)),c=document.createElement("canvas");c.width=Math.round(W*k);c.height=Math.round(H*k);c.getContext("2d").drawImage(cv,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.72)};
  const oc=document.createElement("canvas");oc.width=W;oc.height=H;oc.getContext("2d").putImageData(orig,0,0);
