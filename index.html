@@ -185,6 +185,22 @@ code{font-size:13px;overflow-wrap:anywhere}
 .tbnav button.prim{background:var(--acc);border-color:var(--acc);color:#fff}
 .tbnav button:disabled{opacity:.4}
 [hidden]{display:none!important}
+#hinv:empty,#hres:empty{display:none}
+.hbase{display:flex;gap:10px;align-items:center;margin-top:12px}
+.hpick{position:relative;width:56px;height:56px;flex:none;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1.5px var(--line)}
+.hpick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.hpick span{display:block;width:100%;height:100%}
+.hbase input[type=search]{flex:1;min-width:0}
+#hsvg{display:block;width:100%;max-width:340px;margin:8px auto 0;touch-action:manipulation;cursor:pointer}
+.hgrp{background:var(--card);border-radius:16px;padding:12px;margin-top:10px}
+.hgrp h4{margin:0 0 8px;display:flex;align-items:center;gap:10px;font-size:15px}
+.hgrp h4 i{width:34px;height:34px;border-radius:10px;flex:none;box-shadow:inset 0 -4px 0 rgba(0,0,0,.15)}
+.hpaint{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+.hpaint i{width:26px;height:26px;border-radius:50%;flex:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.hpaint span{flex:1;min-width:0;font-size:14.5px}.hpaint small{display:block;color:var(--quiet);font-size:12.5px}
+.hpaint button{flex:none}
+.hbar{display:flex;height:46px;border-radius:12px;overflow:hidden;margin-top:12px}
+.hbar div{display:flex;align-items:flex-end;justify-content:center;font:600 11px Inter,sans-serif;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);padding-bottom:4px}
 .brandsel{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
 .brandsel label{font-weight:600;font-size:14.5px}
 .brandsel select{width:auto;flex:1 1 180px;min-height:44px}
@@ -331,6 +347,7 @@ code{font-size:13px;overflow-wrap:anywhere}
   <button data-t="calc" aria-pressed="false">Kalkulator</button>
   <button data-t="foto" aria-pressed="false">Ze zdjęcia</button>
   <button data-t="plan" aria-pressed="false">Plan kolorów</button>
+  <button data-t="harm" aria-pressed="false">Harmonia</button>
   <button data-t="kopia" aria-pressed="false">Kopia</button>
   <button data-t="warsztat" aria-pressed="false">Warsztat</button>
  </div>
@@ -423,6 +440,21 @@ code{font-size:13px;overflow-wrap:anywhere}
   </div>
  </div>
 
+ <div class="tool" id="t-harm" hidden>
+  <p class="lead">Wybierz kolor główny figurki. Koło pokaże kolory, które do niego pasują, a pod spodem najbliższe farby.</p>
+  <div class="hbase">
+   <label class="hpick"><input type="color" id="hcol" value="#b8222b"><span id="hsw"></span></label>
+   <input id="hq" type="search" placeholder="albo wpisz farbę, np. Gory Red" autocomplete="off">
+  </div>
+  <div class="list" id="hres"></div>
+  <div class="chips" id="hinv" aria-label="Z inwentarza"></div>
+  <div class="seg" role="group" aria-label="Koło" id="hwheel" style="margin-top:12px"><button data-w="ryb" aria-pressed="true">Koło malarskie</button><button data-w="rgb" aria-pressed="false">Koło cyfrowe</button></div>
+  <div class="chips" id="hmode" role="group" aria-label="Harmonia" style="margin-top:10px"></div>
+  <svg id="hsvg" viewBox="0 0 300 300" role="img" aria-label="Koło barw"></svg>
+  <p class="note" style="text-align:center;margin-top:-4px">Dotknij koła, żeby zmienić odcień.</p>
+  <div class="tip" id="hdesc"></div>
+  <div id="hout"></div>
+ </div>
  <div class="tool" id="t-kopia" hidden>
   <p class="lead">Strona w przeglądarce i aplikacja na telefonie mają osobne dane. Skopiuj je tutaj i wklej w drugim miejscu.</p>
   <div class="gen"><button id="kexp">Eksportuj wszystko</button><button id="kexp2">Bez zdjęć (mniejszy)</button></div>
@@ -878,7 +910,7 @@ progRender(F2[fcur]);
 
 // ===== segmenty =====
 function seg(groupSel,show){document.querySelector(groupSel).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;document.querySelectorAll(groupSel+" button").forEach(x=>x.setAttribute("aria-pressed",x===b));show(b.dataset.t)})}
-seg("#narzedzia .seg",t=>{["farby","zam","timer","calc","foto","plan","kopia","warsztat"].forEach(x=>$("t-"+x).hidden=x!==t);store.set("tool",t)});
+seg("#narzedzia .seg",t=>{["farby","zam","timer","calc","foto","plan","harm","kopia","warsztat"].forEach(x=>$("t-"+x).hidden=x!==t);store.set("tool",t)});
 {const t=store.get("tool","farby");const b=document.querySelector(`#narzedzia .seg button[data-t="${t}"]`);if(b)b.click()}
 seg("#figurki .seg",t=>{$("fg-guide").hidden=t!=="guide";$("fg-gal").hidden=t!=="gal";$("fg-queue").hidden=t!=="queue";if(t==="queue")qRender()});
 
@@ -1275,6 +1307,69 @@ TRREADY=true;
 function brandAll(){["bsel1","bsel2"].forEach(i=>$(i).value=brand);$("bnote1").hidden=$("bnote2").hidden=brand==="V";try{show();showFig();bRender()}catch(e){}}
 ["bsel1","bsel2"].forEach(i=>$(i).addEventListener("change",e=>{brand=e.target.value;store.set("brand",brand);brandAll()}));
 brandAll();
+
+// ===== harmonia kolorów =====
+{
+const HM=[["comp","Dopełniające",[0,180],"Kolory naprzeciw siebie. Najmocniejszy kontrast: płaszcz w jednym, dodatki w drugim. Np. niebieska zbroja i pomarańczowe detale."],
+ ["split","Rozszczepione",[0,150,210],"Kolor główny i dwa sąsiadujące z jego przeciwieństwem. Kontrast jak w dopełniających, ale łagodniejszy i łatwiejszy do opanowania."],
+ ["anal","Analogiczne",[-30,0,30],"Sąsiedzi na kole. Spokojnie i spójnie, dobre do natury, ognia, skór i tkanin. Dodaj jeden mały akcent kontrastowy."],
+ ["tri","Triada",[0,120,240],"Trzy kolory w równych odstępach. Barwnie i wesoło. Jeden niech dominuje, dwa pozostałe na mniejsze elementy."],
+ ["rect","Prostokąt",[0,60,180,240],"Dwie pary dopełniające. Bogata paleta do większych figurek i dioram. Przygaś część kolorów, żeby nie było pstrokato."],
+ ["sq","Kwadrat",[0,90,180,270],"Cztery kolory co 90°. Bardzo kolorowo, dobre dla bohaterów z kreskówek. Pilnuj proporcji."],
+ ["mono","Monochromatyczne",null,"Jeden odcień w kilku jasnościach. Elegancko i bezpiecznie, idealne na pierwsze figurki. Głębię daje cień i rozjaśnienie."]];
+let hm=store.get("hmode","comp"),hw=store.get("hwheel","ryb"),hbase=store.get("hbase","#b8222b");
+const RG=[0,35,60,120,200,240,290,360],RY=[0,60,120,180,220,240,300,360];
+const pw=(x,A,B)=>{x=((x%360)+360)%360;for(let i=1;i<A.length;i++)if(x<=A[i])return B[i-1]+(x-A[i-1])/(A[i]-A[i-1])*(B[i]-B[i-1]);return x};
+const toW=h=>hw==="ryb"?pw(h,RG,RY):h,fromW=h=>hw==="ryb"?pw(h,RY,RG):((h%360)+360)%360;
+function hsl(hex){const [r,g,b]=hx(hex).map(v=>v/255),mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;let h=0,s=0;if(d){s=d/(1-Math.abs(2*l-1));h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return [h,s,l]}
+function fromHsl(h,s,l){const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2;const [r,g,b]=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];return toHex([r+m,g+m,b+m].map(v=>v*255))}
+function targets(){const [h,s,l]=hsl(hbase);const M=HM.find(x=>x[0]===hm);
+ if(!M[2])return [-.28,-.14,0,.14,.28].map(k=>({hex:k?fromHsl(h,s,Math.max(.06,Math.min(.94,l+k))):hbase,ang:toW(h),lab:k<0?"ciemniej":k>0?"jaśniej":"główny",main:!k}));
+ return M[2].map(a=>{const w=toW(h)+a;return {hex:a?fromHsl(fromW(w),s,l):hbase,ang:((w%360)+360)%360,lab:a?(a>0?"+":"")+a+"°":"główny",main:!a}})}
+function hdist(A,B){const c1=Math.hypot(A[1],A[2]),c2=Math.hypot(B[1],B[2]),dC=c1-c2,dH2=Math.max(0,(A[1]-B[1])**2+(A[2]-B[2])**2-dC*dC);return Math.sqrt((A[0]-B[0])**2*.8+(dC*.5)**2+dH2)}
+function best(hex,pool,n){const L=lab(hx(hex));return pool.filter(r=>r[5]!=="m"&&r[5]!=="w").map(r=>[r,hdist(L,r.l)]).sort((a,b)=>a[1]-b[1]).slice(0,n)}
+function brandPool(){const b=(typeof brand!=="undefined"&&"CAP".includes(brand))?brand:"V";return [b,DB.filter(r=>r[0]===b&&CORE[b].test(r[1]))]}
+function wheel(T){const cx=150,cy=150;let o="";const N=48;
+ for(let i=0;i<N;i++){const a0=i*360/N,a1=(i+1)*360/N,hh=fromW(a0+180/N);
+  for(const [r0,r1,l] of [[96,140,.5],[62,96,.68],[34,62,.84]]){const p=(a,r)=>[cx+r*Math.sin(a*Math.PI/180),cy-r*Math.cos(a*Math.PI/180)].map(v=>v.toFixed(1)).join(",");
+   o+=`<path d="M${p(a0,r0)}L${p(a0,r1)}A${r1},${r1} 0 0 1 ${p(a1,r1)}L${p(a1,r0)}A${r0},${r0} 0 0 0 ${p(a0,r0)}Z" fill="${fromHsl(hh,.75,l)}"/>`}}
+ o+=`<circle cx="${cx}" cy="${cy}" r="33" fill="var(--bg)"/>`;
+ const seen=new Set();
+ T.forEach(t=>{const k=Math.round(t.ang);const [,,l]=hsl(t.hex);const r=hm==="mono"?140-l*110:118;const x=cx+r*Math.sin(t.ang*Math.PI/180),y=cy-r*Math.cos(t.ang*Math.PI/180);
+  o+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--ink)" stroke-width="2" opacity=".55"/>`;
+  o+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${t.main?17:13}" fill="${t.hex}" stroke="#fff" stroke-width="3"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${t.main?19:15}" fill="none" stroke="var(--ink)" stroke-width="1.5"/>`});
+ o+=`<circle cx="${cx}" cy="${cy}" r="26" fill="${hbase}" stroke="var(--line)" stroke-width="2"/>`;
+ $("hsvg").innerHTML=o}
+function hRender(){$("hcol").value=hbase;$("hsw").style.background=hbase;
+ $("hmode").innerHTML=HM.map(([k,n])=>`<button class="chip" data-h="${k}" aria-pressed="${k===hm}" style="padding-left:14px">${n}</button>`).join("");
+ document.querySelectorAll("#hwheel button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.w===hw));
+ const M=HM.find(x=>x[0]===hm),T=targets();wheel(T);
+ const [,sat]=hsl(hbase);
+ $("hdesc").innerHTML=`<b>${M[1]}:</b> ${M[3]}`+(sat<.12&&hm!=="mono"?"<br><b>Uwaga:</b> wybrany kolor jest prawie szary — harmonia działa najlepiej dla wyrazistych kolorów.":"");
+ const [b,pool]=brandPool(),ir=invRows();
+ const prop=T.length===2?[70,30]:T.length===3?(hm==="anal"?[60,30,10]:[60,30,10]):T.length===4?[50,25,15,10]:[15,20,30,20,15];
+ const ord=hm==="mono"?T:[T.find(t=>t.main),...T.filter(t=>!t.main)];
+ let out=`<div class="hbar">${ord.map((t,i)=>`<div style="background:${t.hex};flex:${prop[i]}">${prop[i]}%</div>`).join("")}</div><p class="note">Proporcje: kolor główny zajmuje najwięcej, akcent najmniej (zasada 60-30-10).</p>`;
+ out+=ord.map(t=>{const inv1=ir.length?best(t.hex,ir,2):[],br=best(t.hex,pool,2);
+  const row=([r,d],tag)=>`<div class="hpaint"><i style="background:${r[4]}"></i><span>${dispName(r)}<small>${tag?"<b>masz</b> · ":""}${codeTxt(r)} · ${d<8?"trafia w punkt":d<16?"dobrze pasuje":d<26?"pasuje":"luźno pasuje"}</small></span><button class="link" data-hb="${r[4]}" aria-label="Ustaw jako główny">◎</button></div>`;
+  return `<div class="hgrp"><h4><i style="background:${t.hex}"></i>${t.main?"Kolor główny":t.lab}</h4>${inv1.map(x=>row(x,1)).join("")}${br.map(x=>row(x,0)).join("")}</div>`}).join("");
+ $("hout").innerHTML=out+`<p class="note">◎ ustawia farbę jako nowy kolor główny. Koło malarskie (czerwony–zielony, niebieski–pomarańczowy, żółty–fioletowy) to to, którego uczą malarze. Koło cyfrowe działa jak w programach graficznych.</p>`;
+ const inv5=ir.filter(r=>r[5]===""||r[5]===undefined).slice(0,30);
+ $("hinv").innerHTML=ir.length?inv5.map(r=>`<button class="chip" data-hb="${r[4]}"><span class="dot" style="width:22px;height:22px;border-radius:50%;background:${r[4]}"></span>${dispName(r)}</button>`).join(""):"";
+ store.set("hmode",hm);store.set("hwheel",hw);store.set("hbase",hbase)}
+$("hmode").addEventListener("click",e=>{const b=e.target.closest("[data-h]");if(!b)return;hm=b.dataset.h;hRender()});
+$("hwheel").addEventListener("click",e=>{const b=e.target.closest("[data-w]");if(!b)return;hw=b.dataset.w;hRender()});
+$("hcol").addEventListener("input",e=>{hbase=e.target.value;hRender()});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-hb]");if(!b)return;hbase=b.dataset.hb;$("hq").value="";$("hres").innerHTML="";hRender();$("hsvg").scrollIntoView({behavior:"smooth",block:"center"})});
+$("hsvg").addEventListener("click",e=>{const r=$("hsvg").getBoundingClientRect(),x=(e.clientX-r.left)/r.width*300-150,y=(e.clientY-r.top)/r.height*300-150;const d=Math.hypot(x,y);if(d<30||d>142)return;
+ const a=(Math.atan2(x,-y)*180/Math.PI+360)%360;const [,s,l]=hsl(hbase);hbase=fromHsl(fromW(a),Math.max(s,.35),Math.min(Math.max(l,.25),.7));hRender()});
+$("hq").addEventListener("input",()=>{const q=$("hq").value.trim().toLowerCase();if(q.length<2){$("hres").innerHTML="";return}
+ const r=DB.filter(x=>x[5]!=="m"&&(x[2].toLowerCase().includes(q)||x[3].includes(q))).slice(0,8);
+ $("hres").innerHTML=r.map(x=>`<div class="hpaint"><i style="background:${x[4]}"></i><span>${dispName(x)}<small>${codeTxt(x)}</small></span><button class="link" data-hb="${x[4]}">Wybierz</button></div>`).join("")||'<p class="note">Nic nie znalazłem.</p>'});
+hRender();
+const _ba=brandAll;
+["bsel1","bsel2"].forEach(i=>$(i).addEventListener("change",()=>{try{hRender()}catch(e){}}));
+}
 
 // nawigacja
 const MAP={przepisy:["przepisy"],figurki:["figurki"],narzedzia:["narzedzia"],wiedza:["kolory","techniki","slownik"],druk:["druk"],zakupy:["zakupy"]};

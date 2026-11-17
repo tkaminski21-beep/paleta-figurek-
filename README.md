@@ -21,11 +21,12 @@ Pomocnik do malowania figurek z druku 3D, z farbami Vallejo, Citadel, AK lub Arm
 | **Zakupy** | Lista z oznaczeniami produktów, „kończy się” i kopiowanie do Google Keep. |
 
 - **Wybór drukarki 3D** — ustawienia do figurek dla Bambu Lab (A1 mini, A1, P1S, X1C), Prusa (MK4, MINI+), Creality (Ender-3 V3 SE, K1C), Elegoo Neptune 4, Anycubic Kobra 3, innej FDM i drukarek żywicznych.
+- **Harmonia kolorów** — koło barw (malarskie RYB lub cyfrowe RGB) z harmoniami: dopełniające, rozszczepione, analogiczne, triada, prostokąt, kwadrat, monochromatyczne. Dla każdego koloru najbliższe farby z inwentarza i wybranej marki oraz proporcje 60-30-10.
 - **Zmiana producenta farb** — przepisy i instrukcje figurek pokazują odpowiedniki Citadel, AK, Army Painter albo farby z Twojego inwentarza (≈ = dobrane po kolorze).
 
 ## Instalacja na Androidzie
 
-1. Pobierz [`apk/PaletaFigurek-1.6.1.apk`](apk/PaletaFigurek-1.6.1.apk).
+1. Pobierz [`apk/PaletaFigurek-1.7.apk`](apk/PaletaFigurek-1.7.apk).
 2. Otwórz plik na telefonie i zezwól na instalację z nieznanych źródeł.
 3. Przy pierwszym uruchomieniu zezwól na powiadomienia (minutnik schnięcia), a przy pierwszym skanowaniu na aparat.
 
