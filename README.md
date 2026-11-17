@@ -1,6 +1,6 @@
 # Paleta figurek
 
-Pomocnik do malowania figurek z druku 3D, z farbami Vallejo. Działa w przeglądarce i jako aplikacja na Androida, bez internetu.
+Pomocnik do malowania figurek z druku 3D, z farbami Vallejo, Citadel, AK lub Army Painter. Działa w przeglądarce i jako aplikacja na Androida, bez internetu.
 
 <p>
 <img src="screenshots/przepisy.png" width="190" alt="Przepisy">
@@ -13,11 +13,11 @@ Pomocnik do malowania figurek z druku 3D, z farbami Vallejo. Działa w przegląd
 
 | Zakładka | Funkcje |
 | --- | --- |
-| **Przepisy** | Materiały (czerwień, skóra, złoto, stal, drewno…) w czterech odcieniach: cień, baza, światło, błysk, z kroplami do mieszania. Brakująca farba dostaje zamiennik. Podstawki: pustynia, ziemia, bruk, lawa, śnieg, bagno, trawa. |
+| **Przepisy** | Wybór marki farb. Materiały (czerwień, skóra, złoto, stal, drewno…) w czterech odcieniach: cień, baza, światło, błysk, z kroplami do mieszania. Brakująca farba dostaje zamiennik. Podstawki: pustynia, ziemia, bruk, lawa, śnieg, bagno, trawa. |
 | **Figurki** | 12 instrukcji (m.in. Artur Morgan, rycerz, ork, smok) z odhaczaniem kroków, tryb przy stole z dużymi literami, własne figurki, kolejka „do pomalowania / w trakcie / gotowe”, galeria zdjęć przed i po. |
 | **Narzędzia** | Inwentarz farb wszystkich marek (ponad 1600 farb Vallejo, Citadel, AK, Army Painter) uzupełniany skanerem kodów kreskowych, zamienniki między markami z przepisem na mieszankę z posiadanych farb i podpowiedzią zakupu, minutnik schnięcia z powiadomieniami, kalkulator rozcieńczania i mieszania, kolory ze zdjęcia, plan kolorów z generatorem zestawów, kopia zapasowa, panel szafki lakierniczej i lampy na ESP32. |
 | **Wiedza** | Koło barw, cień i światło bez szarości, zasada 60/30/10, techniki w obrazkach, słowniczek pojęć. |
-| **Druk 3D** | Ustawienia Bambu Lab A1 mini dla dyszy 0,4 i 0,2 mm, kalkulator skali, przygotowanie wydruku FDM, zenithal, mokra paleta, typowe błędy. |
+| **Druk 3D** | Wybór drukarki (Bambu Lab, Prusa, Creality, Elegoo, Anycubic, inna FDM, żywica) z ustawieniami dla dyszy 0,4 i małej, kalkulator skali, przygotowanie wydruku FDM, zenithal, mokra paleta, typowe błędy. |
 | **Zakupy** | Lista z oznaczeniami produktów, „kończy się” i kopiowanie do Google Keep. |
 
 - **Wybór drukarki 3D** — ustawienia do figurek dla Bambu Lab (A1 mini, A1, P1S, X1C), Prusa (MK4, MINI+), Creality (Ender-3 V3 SE, K1C), Elegoo Neptune 4, Anycubic Kobra 3, innej FDM i drukarek żywicznych.
