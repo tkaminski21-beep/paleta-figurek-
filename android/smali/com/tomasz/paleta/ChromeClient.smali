@@ -34,3 +34,25 @@
     iput-object v2, v0, Lcom/tomasz/paleta/MainActivity;->cb:Landroid/webkit/ValueCallback;
     return v2
 .end method
+
+.method public onPermissionRequest(Landroid/webkit/PermissionRequest;)V
+    .registers 6
+    iget-object v0, p0, Lcom/tomasz/paleta/ChromeClient;->a:Lcom/tomasz/paleta/MainActivity;
+    const-string v1, "android.permission.CAMERA"
+    invoke-virtual {v0, v1}, Lcom/tomasz/paleta/MainActivity;->checkSelfPermission(Ljava/lang/String;)I
+    move-result v2
+    if-nez v2, :ask
+    invoke-virtual {p1}, Landroid/webkit/PermissionRequest;->getResources()[Ljava/lang/String;
+    move-result-object v2
+    invoke-virtual {p1, v2}, Landroid/webkit/PermissionRequest;->grant([Ljava/lang/String;)V
+    return-void
+    :ask
+    const/4 v2, 0x1
+    new-array v2, v2, [Ljava/lang/String;
+    const/4 v3, 0x0
+    aput-object v1, v2, v3
+    const/4 v3, 0x3
+    invoke-virtual {v0, v2, v3}, Lcom/tomasz/paleta/MainActivity;->requestPermissions([Ljava/lang/String;I)V
+    invoke-virtual {p1}, Landroid/webkit/PermissionRequest;->deny()V
+    return-void
+.end method
