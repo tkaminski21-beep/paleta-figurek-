@@ -185,6 +185,10 @@ code{font-size:13px;overflow-wrap:anywhere}
 .tbnav button.prim{background:var(--acc);border-color:var(--acc);color:#fff}
 .tbnav button:disabled{opacity:.4}
 [hidden]{display:none!important}
+.brandsel{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.brandsel label{font-weight:600;font-size:14.5px}
+.brandsel select{width:auto;flex:1 1 180px;min-height:44px}
+#drsel{margin-top:4px}
 .sw2{width:30px;height:30px;border-radius:8px;flex:none;border:1px solid rgba(0,0,0,.15);display:block}
 .sw3{width:56px;height:56px;border-radius:14px;flex:none;border:1px solid rgba(0,0,0,.15);display:block}
 .inv{gap:10px}
@@ -251,7 +255,9 @@ code{font-size:13px;overflow-wrap:anywhere}
 </header>
 
 <section id="przepisy">
- <p class="lead">Wybierz materiał. Kulka pokazuje, jak będzie wyglądał, a kroki mówią, czym go pomalować Twoimi farbami Vallejo.</p>
+ <p class="lead">Wybierz materiał. Kulka pokazuje, jak będzie wyglądał, a kroki mówią, czym go pomalować Twoimi farbami.</p>
+<div class="brandsel"><label for="bsel1">Farby w przepisach:</label><select id="bsel1" class="bsel"><option value="V">Vallejo</option><option value="C">Citadel</option><option value="A">AK 3rd Gen</option><option value="P">Army Painter</option><option value="I">Z mojego inwentarza</option></select></div>
+ <p class="note" id="bnote1" hidden>„≈” oznacza najbliższy odpowiednik dobrany po kolorze z bazy farb. Może się trochę różnić od oryginału.</p>
  <div class="chips" id="chips" role="group" aria-label="Materiał"></div>
  <div class="recipe">
   <div class="ball"><svg id="sphere" viewBox="0 0 200 200" role="img" aria-label="Podgląd koloru"></svg><h3 id="mname"></h3><p class="where" id="mwhere"></p></div>
@@ -268,6 +274,8 @@ code{font-size:13px;overflow-wrap:anywhere}
  <div class="seg seg3" role="group" aria-label="Widok"><button data-t="guide" aria-pressed="true">Instrukcje</button><button data-t="queue" aria-pressed="false">Kolejka</button><button data-t="gal" aria-pressed="false">Galeria</button></div>
  <div id="fg-guide">
  <p class="lead" style="margin-top:10px">Popularne wydruki krok po kroku. Dotknij kroku, żeby go odhaczyć: postęp zapisuje się przy każdej figurce.</p>
+<div class="brandsel"><label for="bsel2">Farby w przepisach:</label><select id="bsel2" class="bsel"><option value="V">Vallejo</option><option value="C">Citadel</option><option value="A">AK 3rd Gen</option><option value="P">Army Painter</option><option value="I">Z mojego inwentarza</option></select></div>
+ <p class="note" id="bnote2" hidden>„≈” oznacza najbliższy odpowiednik dobrany po kolorze z bazy farb. Może się trochę różnić od oryginału.</p>
  <div class="chips" id="fchips" role="group" aria-label="Figurka"></div>
  <div class="fig-head"><h2 id="fname"></h2><p class="note" id="fdesc"></p></div>
  <div class="gen" style="margin-top:10px"><button id="tbopen" class="prim">Tryb przy stole</button><button id="fedit" hidden>Edytuj</button></div>
@@ -404,7 +412,7 @@ code{font-size:13px;overflow-wrap:anywhere}
   <div class="planwrap">
    <svg id="psvg" viewBox="0 0 200 300" role="img" aria-label="Plan kolorów figurki"></svg>
    <div>
-    <p class="mix" id="psel">Wybrana część: płaszcz</p>
+    <p class="mix" id="prsel">Wybrana część: płaszcz</p>
     <div class="pal" id="ppal"></div>
     <h3 class="secth">Generator zestawu</h3>
     <div class="gen"><button data-g="comp">Dopełniające</button><button data-g="tri">Triada</button><button data-g="ana">Sąsiednie</button></div>
@@ -489,12 +497,14 @@ code{font-size:13px;overflow-wrap:anywhere}
 </section>
 
 <section id="druk">
- <h2>Ustawienia A1 mini do figurek</h2>
- <p class="lead">Bambu Studio, PLA. Wybierz dyszę, którą masz założoną.</p>
- <div class="seg" role="group" aria-label="Dysza"><button id="n04" aria-pressed="true">Dysza 0,4 mm</button><button id="n02" aria-pressed="false">Dysza 0,2 mm</button></div>
+ <h2>Ustawienia drukarki do figurek</h2>
+ <label class="fl" for="drsel" style="margin-top:10px">Twoja drukarka</label>
+ <select id="drsel"></select>
+ <p class="lead" id="plead"></p>
+ <div class="seg" role="group" aria-label="Dysza" id="nseg"><button id="n04" aria-pressed="true">Dysza 0,4 mm</button><button id="n02" aria-pressed="false">Mała dysza</button></div>
  <div class="list" id="nset"></div>
  <div class="tip" id="nnote"></div>
- <div class="card" style="margin-top:14px">
+ <div class="card" style="margin-top:14px" id="handy">
   <h3>Gotowy projekt z Bambu Handy</h3>
   <p>W Handy drukujesz profil tak, jak zapisał go autor: wybierasz tylko drukarkę, płytę i filament. Warstwy, podpór ani wypełnienia tam nie zmienisz.</p>
   <p>Żeby zmienić ustawienia: na MakerWorld kliknij <b>Open in Bambu Studio</b> (albo pobierz plik 3MF), zmień drukarkę i ustawienia, pokrój i wyślij do drukarki ze Studia.</p>
@@ -507,12 +517,12 @@ code{font-size:13px;overflow-wrap:anywhere}
   <select id="scl"><option value="64">28 mm (1:64)</option><option value="56" selected>32 mm (1:56)</option><option value="51">35 mm (1:51)</option><option value="33">54 mm (1:33)</option><option value="24">75 mm (1:24)</option><option value="10">Popiersie / duża 1:10</option></select>
   <div class="two">
    <div><label class="fl" for="sre">Wzrost postaci (cm)</label><input id="sre" type="number" inputmode="decimal" value="185" min="20" max="2000"></div>
-   <div><label class="fl" for="smm">Wysokość modelu w Studiu (mm)</label><input id="smm" type="number" inputmode="decimal" value="120" min="1" max="1000"></div>
+   <div><label class="fl" for="smm">Wysokość modelu w slicerze (mm)</label><input id="smm" type="number" inputmode="decimal" value="120" min="1" max="1000"></div>
   </div>
-  <div class="scres"><div><span>Docelowa wysokość</span><b id="sh">—</b></div><div><span>Skala w Bambu Studio</span><b id="sp">—</b></div></div>
+  <div class="scres"><div><span>Docelowa wysokość</span><b id="sh">—</b></div><div><span>Skala w slicerze</span><b id="sp">—</b></div></div>
   <p class="note">Wysokość modelu mierz bez podstawki: zaznacz model w Studiu i odczytaj wymiar Z. Wzrost Artura Morgana to około 185 cm, krasnoluda około 140 cm.</p>
  </div>
- <h2 class="secth">Wydruk z A1 mini do malowania</h2>
+ <h2 class="secth" id="fdmh">Wydruk FDM do malowania</h2>
  <p class="lead">Linie warstw usuwasz przed malowaniem, nie farbą.</p>
  <div class="grid2" id="fdm"></div>
  <h2 class="secth">Zenithal</h2>
@@ -609,6 +619,17 @@ function sphere(c,r=90,cx=100,cy=100,id="s"){
 }
 $("rack").innerHTML=["#8b1c22","#e8701e","#f2c230","#2f6b3b","#1e9a90","#5e3a22","#cdbf98"].map(c=>`<i style="background:${c}"></i>`).join("");
 
+var TRREADY=false;
+function BRAND(){return TRREADY?brand:"V"}
+function trRow(n){if(!TRREADY)return null;const k=LEG[n],r=k&&DBK[k];if(!r)return null;if(brand==="V")return r;
+ const key=brand+"|"+n;if(brand!=="I"&&TRC[key])return TRC[key];
+ const pool=brand==="I"?invRows():DB.filter(x=>x[0]===brand);
+ const c=pool.filter(x=>x[5]===r[5]).map(x=>[x,dE(r.l,x.l)+(brand!=="I"&&!CORE[brand].test(x[1])?4:0)]).sort((a,b)=>a[1]-b[1])[0];
+ const out=c?c[0]:r;if(brand!=="I")TRC[key]=out;return out}
+function trName(n){if(!TRREADY||brand==="V")return n;const r=trRow(n);if(!r)return n;return (brand==="I"&&dk(r)===LEG[n])?n:"≈ "+r[2]}
+function trHex(n){if(!TRREADY||brand==="V")return P[n];const r=trRow(n);return r?r[4]:P[n]}
+function trText(t){if(!TRREADY||brand==="V"||!t)return t;return t.replace(LEGRE,m=>trName(m))}
+function isMiss(n){if(!TRREADY||brand==="V")return own[n]===false;if(brand==="I"||!inv.length)return false;const r=trRow(n);return r?!inv.includes(dk(r)):false}
 let own=store.get("own",{});
 let prog=store.get("prog",{});
 const SUB={"Black":"wash Black w 2–3 warstwach albo Gorgon Brown + Dark Green","Off White":"Ivory","Ivory":"Off White + kropla Bone White","Magic Blue":"Aquamarine + kropla Black (bardziej turkusowy)","Wolf Grey":"Stonewall Grey + Off White + kropla Magic Blue","Basic Skintone":"Ivory 4 + Hot Orange 1 + Gorgon Brown 1","Bone White":"Ivory + kropla Earth","Earth":"Gorgon Brown + Bone White","Gorgon Brown":"Earth + kropla Black","Stonewall Grey":"Black + Off White 1:1","Chainmail":"Tinny Tin (ciemniejszy metal)","Glorious Gold":"Tinny Tin (ciemniejszy)","Tinny Tin":"Glorious Gold + wash Umber","Gory Red":"Scarlet Blood + kropla Black","Scarlet Blood":"Gory Red + kropla Hot Orange","Hot Orange":"Scarlet Blood + Moon Yellow","Moon Yellow":"Ivory + kropla Hot Orange","Yellow Green":"Lime Green","Lime Green":"Yellow Green + Moon Yellow","Scorpy Green":"Cayman Green + Yellow Green","Cayman Green":"Dark Green + Scorpy Green","Dark Green":"Cayman Green + kropla Black","Aquamarine":"Magic Blue + Cayman Green","wash Umber":"Gorgon Brown + Glaze Medium 1:6","wash Black":"Black + Glaze Medium 1:6"};
@@ -620,20 +641,45 @@ function show(){
  $("mname").textContent=m.n;$("mwhere").textContent=m.w;
  const idx=[1,0,2,3];
  $("steps").innerHTML=idx.map(k=>{const [c,mix,where]=m.s[k];
-  const drops=mix.map(([p,n],j)=>(j?"<em>+</em>":"")+Array.from({length:n},()=>`<i style="background:${P[p]}" title="${p}"></i>`).join("")).join("");
-  const txt=mix.map(([p,n])=>(mix.length>1?n+"× ":"")+p+(own[p]===false?'<em class="no">brak</em>':"")).join(" + ");const miss=mix.filter(([p])=>own[p]===false).map(([p])=>`<div class="sub">Zamiast ${p}: ${SUB[p]||"podobny kolor z palety"}</div>`).join("");
+  const drops=mix.map(([p,n],j)=>(j?"<em>+</em>":"")+Array.from({length:n},()=>`<i style="background:${trHex(p)}" title="${trName(p)}"></i>`).join("")).join("");
+  const txt=mix.map(([p,n])=>(mix.length>1?n+"× ":"")+trName(p)+(isMiss(p)?'<em class="no">brak</em>':"")).join(" + ");const miss=mix.filter(([p])=>isMiss(p)).map(([p])=>BRAND()==="V"?`<div class="sub">Zamiast ${p}: ${SUB[p]||"podobny kolor z palety"}</div>`:`<div class="sub">Brakuje ${trName(p)} — sprawdź Narzędzia → Zamienniki</div>`).join("");
   return `<div class="step"><div class="sw" style="background:${c}"><span>${ORDER[k]}</span></div><div><div class="role">${ROLE[k]}</div><div class="mix">${txt}</div><div class="drops">${drops}</div><div class="note">${where}</div>${miss}</div></div>`}).join("");
 }
 $("chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;cur=+b.dataset.i;store.set("mat",cur);show()});
 show();
 
 // ustawienia drukarki
-const NS={
- "04":[["Drukarka w Studiu","A1 mini 0.4 nozzle"],["Wysokość warstwy","0,12 mm (detale 0,08)"],["Pierwsza warstwa","0,2 mm"],["Szerokość linii","domyślna (0,42)"],["Ściany","3"],["Góra / dół","5 / 4 warstwy"],["Wypełnienie","10–15%, gyroid"],["Prędkość ściany zewn.","60–100 mm/s"],["Zwolnij na nawisach","włączone"],["Podpory","drzewkowe (tree), auto"],["Kąt podpór","30–35°"],["Szew (seam)","z tyłu lub wyrównany"],["Ironing","wyłączone"],["Temperatura","wg profilu filamentu"]],
- "02":[["Drukarka w Studiu","A1 mini 0.2 nozzle"],["Wysokość warstwy","0,08 mm (detale 0,06)"],["Pierwsza warstwa","0,1 mm"],["Szerokość linii","domyślna (ok. 0,22)"],["Ściany","4"],["Góra / dół","7 / 6 warstw"],["Wypełnienie","10–15%, gyroid"],["Prędkość ściany zewn.","40–60 mm/s"],["Zwolnij na nawisach","włączone"],["Podpory","drzewkowe (tree), auto"],["Kąt podpór","30°"],["Szew (seam)","z tyłu lub wyrównany"],["Ironing","wyłączone"],["Temperatura","wg profilu filamentu"]]};
-const NN={"04":"Szybki druk większych figurek. Linie warstw będą widoczne, więc licz się z fillerem.","02":"Druk trwa kilka razy dłużej, ale linii prawie nie widać. Używaj suchego, czystego PLA, bez dodatków (glitter, drewno, węgiel)."};
+const PRN=[
+ {id:"a1m",n:"Bambu Lab A1 mini",sl:"Bambu Studio",pr:"Bambu Lab A1 mini",sm:"0,2",kin:"bed",ext:"direct",bambu:1},
+ {id:"a1",n:"Bambu Lab A1",sl:"Bambu Studio",pr:"Bambu Lab A1",sm:"0,2",kin:"bed",ext:"direct",bambu:1},
+ {id:"p1s",n:"Bambu Lab P1S / P1P",sl:"Bambu Studio",pr:"Bambu Lab P1S",sm:"0,2",kin:"xy",ext:"direct",bambu:1,box:1},
+ {id:"x1c",n:"Bambu Lab X1 Carbon",sl:"Bambu Studio",pr:"Bambu Lab X1 Carbon",sm:"0,2",kin:"xy",ext:"direct",bambu:1,box:1},
+ {id:"mk4",n:"Prusa MK4 / MK4S",sl:"PrusaSlicer",pr:"Original Prusa MK4",sm:"0,25",kin:"bed",ext:"direct"},
+ {id:"mini",n:"Prusa MINI+",sl:"PrusaSlicer",pr:"Original Prusa MINI",sm:"0,25",kin:"bed",ext:"bowden"},
+ {id:"e3v3",n:"Creality Ender-3 V3 SE",sl:"Creality Print lub OrcaSlicer",pr:"Creality Ender-3 V3 SE",sm:"0,2",kin:"bed",ext:"direct"},
+ {id:"k1c",n:"Creality K1C / K1",sl:"Creality Print lub OrcaSlicer",pr:"Creality K1C",sm:"0,2",kin:"xy",ext:"direct",box:1},
+ {id:"n4",n:"Elegoo Neptune 4 / 4 Pro",sl:"OrcaSlicer lub Elegoo Cura",pr:"Elegoo Neptune 4 Pro",sm:"0,2",kin:"bed",ext:"direct"},
+ {id:"kob3",n:"Anycubic Kobra 3",sl:"Anycubic Slicer Next lub OrcaSlicer",pr:"Anycubic Kobra 3",sm:"0,2",kin:"bed",ext:"direct"},
+ {id:"fdm",n:"Inna drukarka FDM",sl:"OrcaSlicer, Cura lub slicer producenta",pr:"profil Twojej drukarki",sm:"0,2",kin:"bed",ext:"direct"},
+ {id:"resin",n:"Drukarka żywiczna (Elegoo, Anycubic, Phrozen…)",sl:"Chitubox, Lychee lub slicer producenta",resin:1}];
+let pid=store.get("printer","a1m");if(!PRN.find(x=>x.id===pid))pid="a1m";
 let nz=store.get("nozzle","04");
-function showN(){$("nset").innerHTML=NS[nz].map(([a,b])=>`<div class="row"><span>${a}</span><b>${b}</b></div>`).join("");$("nnote").innerHTML="<b>Dysza "+(nz==="04"?"0,4":"0,2")+":</b> "+NN[nz];$("n04").setAttribute("aria-pressed",nz==="04");$("n02").setAttribute("aria-pressed",nz==="02")}
+$("drsel").innerHTML=PRN.map(x=>`<option value="${x.id}">${x.n}</option>`).join("");$("drsel").value=pid;
+function prRows(pr,z){if(pr.resin)return [["Slicer",pr.sl],["Wysokość warstwy","0,03–0,05 mm (detale 0,03)"],["Czas naświetlania","wg producenta żywicy; zrób test kalibracyjny"],["Ustawienie modelu","pochylony 30–45°, twarz bez podpór"],["Podpory","lekkie lub średnie, gęściej pod nawisami"],["Wydrążanie","duże figurki: ścianka 2 mm + 2 otwory odpływowe"],["Mycie","IPA 2 razy po 2–3 min"],["Utwardzanie","UV 2–4 min po wyschnięciu"],["Bezpieczeństwo","rękawice nitrylowe, wietrzenie"]];
+ const s=z==="02",bow=pr.ext==="bowden";
+ return [["Profil w slicerze",`${pr.pr} ${s?pr.sm:"0,4"} nozzle`+(pr.sl==="Bambu Studio"?"":` (${pr.sl})`)],["Wysokość warstwy",s?"0,08 mm (detale 0,06)":"0,12 mm (detale 0,08)"],["Pierwsza warstwa",s?"0,1 mm":"0,2 mm"],["Szerokość linii",s?"domyślna (ok. "+(pr.sm==="0,25"?"0,27":"0,22")+")":"domyślna (0,42)"],["Ściany",s?"4":"3"],["Góra / dół",s?"7 / 6 warstw":"5 / 4 warstwy"],["Wypełnienie","10–15%, gyroid"],["Prędkość ściany zewn.",s?"40–60 mm/s":(pr.kin==="xy"?"80–120 mm/s":"60–100 mm/s")],["Zwolnij na nawisach","włączone"],["Podpory","drzewkowe (tree), auto"],["Kąt podpór",s?"30°":"30–35°"],["Retrakcja",bow?"z profilu (Bowden: dłuższa, ok. 3–5 mm)":"z profilu drukarki"],["Szew (seam)","z tyłu lub wyrównany"],["Ironing","wyłączone"],["Temperatura","wg profilu filamentu"]]}
+function prNote(pr,z){if(pr.resin)return "Żywica daje gładkie figurki bez linii warstw, więc filler nie jest potrzebny: wystarczy umyć, utwardzić i dać podkład. Żywica przed utwardzeniem jest drażniąca — pracuj w rękawicach.";
+ const s=z==="02";let t=s?`Druk trwa kilka razy dłużej, ale linii prawie nie widać. Używaj suchego, czystego PLA, bez dodatków (glitter, drewno, węgiel).`:`Szybki druk większych figurek. Linie warstw będą widoczne, więc licz się z fillerem.`;
+ if(pr.box)t+=" Zamknięta obudowa: przy PLA uchyl drzwiczki albo zdejmij pokrywę, żeby PLA się nie przegrzewało.";
+ if(pr.ext==="bowden")t+=" Bowden: przy dużej liczbie podpór sprawdź nitki (stringing) i w razie czego zwiększ retrakcję.";
+ if(s&&pr.sm==="0,25")t+=" Prusa oferuje dyszę 0,25 mm — ustawienia są dla niej.";
+ return t}
+function showN(){const pr=PRN.find(x=>x.id===pid);$("nset").innerHTML=prRows(pr,nz).map(([a,b])=>`<div class="row"><span>${a}</span><b>${b}</b></div>`).join("");
+ $("nnote").innerHTML="<b>"+(pr.resin?"Żywica":"Dysza "+(nz==="04"?"0,4":pr.sm))+":</b> "+prNote(pr,nz);
+ $("nseg").hidden=!!pr.resin;$("n02").textContent=`Mała dysza ${pr.sm||""} mm`;$("n04").setAttribute("aria-pressed",nz==="04");$("n02").setAttribute("aria-pressed",nz==="02");
+ $("plead").textContent=pr.resin?`${pr.sl}, żywica standardowa lub ABS-like.`:`${pr.sl}, PLA. Wybierz dyszę, którą masz założoną.`;
+ $("handy").hidden=!pr.bambu;$("fdmh").hidden=$("fdm").hidden=!!pr.resin}
+$("drsel").addEventListener("change",()=>{pid=$("drsel").value;store.set("printer",pid);showN()});
 $("n04").onclick=()=>{nz="04";store.set("nozzle",nz);showN()};$("n02").onclick=()=>{nz="02";store.set("nozzle",nz);showN()};
 showN();
 
@@ -749,9 +795,9 @@ function showFig(){
  $("fchips").innerHTML=F2.map((f,i)=>`<button class="chip" aria-pressed="${i===fcur}" data-i="${i}"><b style="background:linear-gradient(135deg,${(f.p[0]||[0,["#999","#999"]])[1][1]} 50%,${(f.p[1]||f.p[0]||[0,["#999","#999"]])[1][1]} 50%)"></b>${f.n.replace(/</g,"&lt;")}</button>`).join("")+'<button class="chip" data-add="1"><b style="background:var(--line)"></b>+ Własna</button>';
  $("fedit").hidden=!F2[fcur].own;
  const f=F2[fcur];$("fname").textContent=f.n;$("fdesc").textContent=f.d||"";
- $("fparts").innerHTML=f.p.map(([n,c,t])=>`<div class="part"><div class="trio">${c.map(x=>`<i style="background:${x}"></i>`).join("")}</div><div><b>${n}</b><span>${t}</span></div></div>`).join("");
+ $("fparts").innerHTML=f.p.map(([n,c,t])=>`<div class="part"><div class="trio">${c.map(x=>`<i style="background:${x}"></i>`).join("")}</div><div><b>${n}</b><span>${trText(t)}</span></div></div>`).join("");
  progRender(f);
- $("ftip").innerHTML="<b>Wskazówka:</b> "+f.t;
+ $("ftip").innerHTML="<b>Wskazówka:</b> "+trText(f.t);
 }
 $("fchips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;if(b.dataset.add){cfOpen(-1);return}fcur=+b.dataset.i;store.set("fig",fcur);showFig()});
 showFig();
@@ -821,7 +867,7 @@ function progRender(f){
  const done=prog[F2[fcur].n]||[];
  const n=done.filter(Boolean).length,t=f.k.length;
  $("fprog").innerHTML=`<div class="pbar"><i style="width:${Math.round(n/t*100)}%"></i></div><span>${n} z ${t}</span>${n?'<button id="freset" class="link">Od nowa</button>':""}`;
- $("fsteps").innerHTML=f.k.map((x,j)=>`<li class="${done[j]?"ok":""}" data-j="${j}" role="checkbox" aria-checked="${!!done[j]}" tabindex="0"><span>${x}</span></li>`).join("");
+ $("fsteps").innerHTML=f.k.map((x,j)=>`<li class="${done[j]?"ok":""}" data-j="${j}" role="checkbox" aria-checked="${!!done[j]}" tabindex="0"><span>${trText(x)}</span></li>`).join("");
 }
 $("fsteps").addEventListener("click",e=>{const li=e.target.closest("li");if(!li)return;const j=+li.dataset.j;const d=prog[F2[fcur].n]||[];d[j]=!d[j];prog[F2[fcur].n]=d;store.set("prog",prog);progRender(F2[fcur])});
 $("fprog").addEventListener("click",e=>{if(e.target.id!=="freset")return;prog[F2[fcur].n]=[];store.set("prog",prog);progRender(F2[fcur])});
@@ -906,7 +952,7 @@ const B2=[
  {n:"Trawa",c:["#5e3a22","#5e9b3a","#a8c94a"],k:["Baza jak „Ziemia leśna”.","Klej PVA plamami.","Posyp trawą elektrostatyczną i delikatnie dmuchnij.","Po wyschnięciu strzep nadmiar.","Drybrush Yellow Green na czubki trawy (opcjonalnie)."],buy:"Trawa elektrostatyczna 2–4 mm, klej PVA"}];
 let bcur=store.get("base",0);if(!B2[bcur])bcur=0;
 function bRender(){$("bchips").innerHTML=B2.map((b,i)=>`<button class="chip" aria-pressed="${i===bcur}" data-i="${i}"><b style="background:linear-gradient(180deg,${b.c[2]},${b.c[1]} 50%,${b.c[0]})"></b>${b.n}</button>`).join("");
- const b=B2[bcur];$("bbody").innerHTML=`<div class="basepic" style="background:linear-gradient(180deg,${b.c[2]} 0 22%,${b.c[1]} 22% 70%,${b.c[0]} 70%)"></div><ol class="flow">${b.k.map(x=>`<li><span>${x}</span></li>`).join("")}</ol>${b.buy?`<div class="tip"><b>Do kupienia:</b> ${b.buy}</div>`:""}`}
+ const b=B2[bcur];$("bbody").innerHTML=`<div class="basepic" style="background:linear-gradient(180deg,${b.c[2]} 0 22%,${b.c[1]} 22% 70%,${b.c[0]} 70%)"></div><ol class="flow">${b.k.map(x=>`<li><span>${trText(x)}</span></li>`).join("")}</ol>${b.buy?`<div class="tip"><b>Do kupienia:</b> ${b.buy}</div>`:""}`}
 $("bchips").addEventListener("click",e=>{const x=e.target.closest(".chip");if(!x)return;bcur=+x.dataset.i;store.set("base",bcur);bRender()});
 bRender();
 
@@ -1012,7 +1058,7 @@ function pRender(){
  $("psvg").innerHTML=`<defs><linearGradient id="psh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></linearGradient></defs>`+
  REG.map(([r])=>`<g data-r="${r}" fill="${P[plan[r]]||"#ccc"}" stroke="${r===psel?"var(--acc)":"rgba(0,0,0,.35)"}" stroke-width="${r===psel?3:1}" style="cursor:pointer">${SHP[r]}</g>`).join("")+
  `<g fill="url(#psh)" pointer-events="none">${REG.map(([r])=>SHP[r]).join("")}</g>`;
- $("psel").innerHTML=`Wybrana część: <b>${REG.find(x=>x[0]===psel)[1]}</b> — ${plan[psel]||"brak"}`;
+ $("prsel").innerHTML=`Wybrana część: <b>${REG.find(x=>x[0]===psel)[1]}</b> — ${plan[psel]||"brak"}`;
  $("ppal").innerHTML=owned().filter(n=>!n.startsWith("wash")).map(n=>`<button data-p="${n}" aria-pressed="${plan[psel]===n}" title="${n}"><i style="background:${P[n]}"></i><span>${n}</span></button>`).join("");
  store.set("plan",plan)}
 $("psvg").addEventListener("click",e=>{const g=e.target.closest("g[data-r]");if(!g)return;psel=g.dataset.r;pRender()});
@@ -1086,7 +1132,7 @@ let tj=0,wl=null;
 async function wake(on){try{if(on&&navigator.wakeLock)wl=await navigator.wakeLock.request("screen");else if(wl){await wl.release();wl=null}}catch(e){}}
 function tbRender(){const f=F2[fcur],n=f.k.length;const d=prog[f.n]||[];
  if(tj>=n){$("tbbody").innerHTML=`<div class="tbdone"><b>Figurka skończona!</b><p>Zrób zdjęcie i dodaj je do galerii.</p><button class="gbtn" id="tbgal">Dodaj do galerii</button></div>`;$("tbstep").textContent=`${n} z ${n}`;$("tbprev").disabled=false;$("tbnext").textContent="Zamknij";return}
- $("tbstep").textContent=`Krok ${tj+1} z ${n}`;$("tbbody").innerHTML=`<p class="tbtext">${f.k[tj]}</p><div class="tbparts">${f.p.map(([nm,c])=>`<span><i style="background:${c[1]}"></i>${nm}</span>`).join("")}</div>${d[tj]?'<p class="note">✓ Ten krok masz już odhaczony.</p>':""}`;
+ $("tbstep").textContent=`Krok ${tj+1} z ${n}`;$("tbbody").innerHTML=`<p class="tbtext">${trText(f.k[tj])}</p><div class="tbparts">${f.p.map(([nm,c])=>`<span><i style="background:${c[1]}"></i>${nm}</span>`).join("")}</div>${d[tj]?'<p class="note">✓ Ten krok masz już odhaczony.</p>':""}`;
  $("tbprev").disabled=tj===0;$("tbnext").textContent=tj===n-1?"Gotowe, koniec ✓":"Gotowe, dalej →"}
 $("tbopen").onclick=()=>{const f=F2[fcur],d=prog[f.n]||[];tj=d.findIndex(x=>!x);if(tj<0)tj=d.length>=f.k.length?0:d.length;$("tb").hidden=false;$("tbname").textContent=f.n;document.body.style.overflow="hidden";wake(true);tbRender()};
 function tbClose(){$("tb").hidden=true;document.body.style.overflow="";wake(false);progRender(F2[fcur])}
@@ -1219,6 +1265,13 @@ function zDetail(){const r=DBK[zsel];if(!r)return;const k=dk(r),t=r[5],has=new S
  <p class="note">Kolory z bazy Miniature Painter Pro (licencja MIT). Ekran nie odda farby idealnie — traktuj to jako podpowiedź.</p></div>`}
 $("zdet").addEventListener("click",e=>{const b=e.target.closest("[data-buy]");if(!b)return;const r=DBK[b.dataset.buy],n=dispName(r);CODE[n]=codeTxt(r);low[n]=true;store.set("low",low);lowRender();b.textContent="Dodano do zakupów ✓";b.disabled=true});
 syncInv();iRender();zq2Render();
+var brand=store.get("brand","V");const TRC={};
+const LEGRE=new RegExp("(^|[^A-Za-z])("+Object.keys(LEG).sort((a,b)=>b.length-a.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")(?![A-Za-z])","g");
+const _trText=trText;trText=function(t){if(!TRREADY||brand==="V"||!t)return t;return t.replace(LEGRE,(m,a,b)=>a+trName(b))};
+TRREADY=true;
+function brandAll(){["bsel1","bsel2"].forEach(i=>$(i).value=brand);$("bnote1").hidden=$("bnote2").hidden=brand==="V";try{show();showFig();bRender()}catch(e){}}
+["bsel1","bsel2"].forEach(i=>$(i).addEventListener("change",e=>{brand=e.target.value;store.set("brand",brand);brandAll()}));
+brandAll();
 
 // nawigacja
 const MAP={przepisy:["przepisy"],figurki:["figurki"],narzedzia:["narzedzia"],wiedza:["kolory","techniki","slownik"],druk:["druk"],zakupy:["zakupy"]};
