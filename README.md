@@ -26,7 +26,7 @@ Pomocnik do malowania figurek z druku 3D, z farbami Vallejo, Citadel, AK lub Arm
 
 ## Instalacja na Androidzie
 
-1. Pobierz [`apk/PaletaFigurek-1.9.1.apk`](apk/PaletaFigurek-1.9.1.apk).
+1. Pobierz [`apk/PaletaFigurek-1.9.2.apk`](apk/PaletaFigurek-1.9.2.apk).
 2. Otwórz plik na telefonie i zezwól na instalację z nieznanych źródeł.
 3. Przy pierwszym uruchomieniu zezwól na powiadomienia (minutnik schnięcia), a przy pierwszym skanowaniu na aparat.
 
